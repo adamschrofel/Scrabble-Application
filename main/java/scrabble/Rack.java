@@ -44,15 +44,15 @@ public class Rack {
         return new Rack(counts, blanks, totalTiles);
     }
 
-    public int[] getCounts(){
+    public int[] getCounts() {
         return counts;
     }
 
-    public int getBlanks(){
+    public int getBlanks() {
         return blanks;
     }
 
-    public int getTotalTiles(){
+    public int getTotalTiles() {
         return totalTiles;
     }
 }

@@ -1,3 +1,4 @@
+package scrabble;
 
 public class Rack {
 

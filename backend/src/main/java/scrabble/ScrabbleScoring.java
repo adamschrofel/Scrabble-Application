@@ -1,3 +1,4 @@
+package scrabble;
 
 public final class ScrabbleScoring {
     private ScrabbleScoring() {
@@ -15,6 +16,7 @@ public final class ScrabbleScoring {
         setTileScore("QZ", 10);
     }
 
+    // Sets tile score to corresponding value
     private static void setTileScore(String letters, int value) {
         for (int i = 0; i < letters.length(); i++) {
             char c = letters.charAt(i);

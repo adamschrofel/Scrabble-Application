@@ -1,5 +1,5 @@
-import java.util.*;
-import java.io.*;
+package scrabble;
+
 
 public class WordFinder {
     private final List<String>[] wordsByLength;

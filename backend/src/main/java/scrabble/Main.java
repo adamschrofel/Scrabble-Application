@@ -1,4 +1,4 @@
-import java.util.*;
+package scrabble;
 
 public class Main {
     public static void main(String[] args) throws Exception {
@@ -13,7 +13,7 @@ public class Main {
         Scanner sc = new Scanner(System.in);
         System.out.print("Enter tiles (max 15, ?/* = blank): ");
         String rack = sc.nextLine();
-
+        sc.close();
         List<String> playable = wf.findPlayableWords(rack);
         List<WordFinder.LengthGroup> groups = wf.groupPlayableWords(playable);
 

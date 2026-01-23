@@ -16,8 +16,14 @@ public class WordFinder {
     }
 
     private void loadWordList(String path) {
+        InputStream in = WordFinder.class.getResourceAsStream("/" + path);
 
-        try (Scanner kb = new Scanner(new File(path))) {
+        if (in == null) {
+            throw new RuntimeException(
+                    "Could not find word list on classpath: " + path);
+        }
+
+        try (Scanner kb = new Scanner(in)) {
             while (kb.hasNextLine()) {
                 String line = kb.nextLine().trim();
                 if (line.isEmpty())
@@ -29,10 +35,7 @@ public class WordFinder {
                     wordsByLength[length].add(word);
                 }
             }
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException("Could not find word list file: " + path, e);
         }
-
     }
 
     public List<String> findPlayableWords(String input) {

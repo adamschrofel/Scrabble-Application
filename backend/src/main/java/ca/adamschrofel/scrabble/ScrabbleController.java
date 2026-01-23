@@ -9,7 +9,7 @@ import java.util.*;
 @RestController
 public class ScrabbleController {
 
-    @GetMapping("/solve")
+    @GetMapping("/api/solve")
     public Map<String, Object> solve(@RequestParam String tiles) throws Exception {
         Map<String, Object> res = new LinkedHashMap<>();
         res.put("tiles", tiles);

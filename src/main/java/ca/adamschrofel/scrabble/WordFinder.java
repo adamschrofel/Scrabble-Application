@@ -1,5 +1,7 @@
-package scrabble;
+package ca.adamschrofel.scrabble;
 
+import java.util.*;
+import java.io.*;
 
 public class WordFinder {
     private final List<String>[] wordsByLength;

@@ -1,4 +1,5 @@
-package scrabble;
+package ca.adamschrofel.scrabble;
+import java.util.*;
 
 public class Main {
     public static void main(String[] args) throws Exception {

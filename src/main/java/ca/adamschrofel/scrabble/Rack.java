@@ -1,4 +1,4 @@
-package scrabble;
+package ca.adamschrofel.scrabble;
 
 public class Rack {
 

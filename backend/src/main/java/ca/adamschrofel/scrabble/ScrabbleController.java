@@ -8,12 +8,18 @@ import java.util.*;
 
 @RestController
 public class ScrabbleController {
+    private final ScrabbleService service;
+
+    public ScrabbleController(ScrabbleService service){
+        this.service = service;
+    }
+
 
     @GetMapping("/api/solve")
     public Map<String, Object> solve(@RequestParam String tiles) throws Exception {
         Map<String, Object> res = new LinkedHashMap<>();
         res.put("tiles", tiles);
-        res.put("groups", Main.solve(tiles));
+        res.put("groups", service.solve(tiles));
         return res;
     }
 }

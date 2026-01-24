@@ -1,7 +1,7 @@
 package ca.adamschrofel.scrabble;
 
-public final class ScrabbleScoring {
-    private ScrabbleScoring() {
+public final class TileScoring {
+    private TileScoring() {
     }
 
     private static final int[] SCORE = new int[26];

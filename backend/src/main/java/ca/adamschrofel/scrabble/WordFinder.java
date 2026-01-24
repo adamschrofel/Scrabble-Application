@@ -101,7 +101,7 @@ public class WordFinder {
         return true;
     }
 
-    public class LengthGroup {
+    public static class LengthGroup {
         public final int length;
         public final List<String> words;
 

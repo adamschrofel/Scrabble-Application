@@ -1,48 +1,97 @@
-import { useState } from 'react'
+import { useState } from "react";
 
-import './App.css'
+import "./App.css";
 
 export default function App() {
-  const [tiles, setTiles] = useState("triedest");
+  const [tiles, setTiles] = useState("");
   const [data, setData] = useState(null);
-  const [err, setErr] = useState("");
+  const [error, setError] = useState("");
 
-  async function solve() {
-    setErr("");
+  async function handleSolve() {
+    const trimmed = tiles.trim();
+    if (!trimmed) {
+      setError("Enter Tiles");
+      setData(null);
+      return;
+    }
+
+    setError("");
     setData(null);
-    try{
-      const res = await fetch(`/api/solve?tiles=${encodeURIComponent(tiles)}`);
-      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    try {
+      const res = await fetch(
+        `/api/solve?tiles=${encodeURIComponent(trimmed)}`,
+      );
       const json = await res.json();
+
+      if (!res.ok) {
+        throw new Error(json?.message || `Failed ${res.status}`);
+      }
       setData(json);
-    } catch (e){
-      setErr(String(e));
+    } catch (e) {
+      setError(e.message);
     }
   }
+
+  function onKeyDown(e) {
+    if (e.key === "Enter") handleSolve();
+  }
+
   return (
-    <div style={{maxWidth: 600, margin: "20px auto", padding: 16}}>
+    <div style={{ maxWidth: 600, margin: "20px auto", padding: 16 }}>
       <h1>Scrabble Word Finder</h1>
 
-      <div style={{display: "flex", gap: 10}}>
+      <div style={{ display: "flex", gap: 10 }}>
         <input
           value={tiles}
-          onChange= {(e)=> setTiles(e.target.value)}
-          />
-        <button onClick={solve} style= {{padding: "10 px 10 px", fontSize: 10}}>
+          onChange={(e) => setTiles(e.target.value)}
+          onKeyDown={onKeyDown}
+        />
+        <button
+          onClick={handleSolve}
+          style={{ padding: "10 px 10 px", fontSize: 10 }}
+        >
           Solve
         </button>
       </div>
 
-      {err && <p style={{ marginTop: 16 }}>Error: {err}</p>}
+      {error && <p style={{ marginTop: 16 }}>Error: {err}</p>}
 
-      {data && (
-        <pre style={{ marginTop: 16, overflowX: "auto" }}>
-          {JSON.stringify(data, null, 2)}
-        </pre>
+      {data?.groups && (
+        <div style={{ marginTop: 16 }}>
+          {data.groups.length === 0 ? (
+            <p>No words found.</p>
+          ) : (
+            data.groups.map((g) => (
+              <div key={g.length} style={{ marginBottom: 16 }}>
+                <h2 style={{ margin: "10px 0" }}>{g.length}-letter words</h2>
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns:
+                      "repeat(auto-fill, minmax(120px, 1fr))",
+                    gap: 6,
+                  }}
+                >
+                  {g.words.map((w) => (
+                    <div
+                      key={w}
+                      style={{
+                        padding: "6px 8px",
+                        border: "1px solid #ddd",
+                        borderRadius: 8,
+                        textAlign: "center",
+                      }}
+                    >
+                      {w}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))
+          )}
+        </div>
       )}
-
     </div>
-  )
+  );
 }
-
-

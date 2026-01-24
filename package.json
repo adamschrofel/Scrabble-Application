@@ -3,7 +3,8 @@
   "scripts": {
     "dev": "concurrently \"cd backend && mvn spring-boot:run\" \"cd frontend && npm run dev\"",
     "open": "code scrabble.code-workspace",
-    "start": "npm run open && npm run dev"
+    "start": "npm run open && npm run dev",
+    "frontend": "cd frontend && npm run dev"
   },
   "devDependencies": {
     "concurrently": "^8.2.0"

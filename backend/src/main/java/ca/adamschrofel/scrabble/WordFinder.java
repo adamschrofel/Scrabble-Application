@@ -14,7 +14,7 @@ public class WordFinder {
         }
         loadWordList(wordListPath);
     }
-
+    //TODO change name 
     private void loadWordList(String path) {
         InputStream in = WordFinder.class.getResourceAsStream("/" + path);
 

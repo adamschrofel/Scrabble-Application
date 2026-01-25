@@ -10,16 +10,16 @@ import java.util.*;
 public class ScrabbleController {
     private final ScrabbleService service;
 
-    public ScrabbleController(ScrabbleService service){
+    public ScrabbleController(ScrabbleService service) {
         this.service = service;
     }
 
-
     @GetMapping("/api/solve")
-    public Map<String, Object> solve(@RequestParam String tiles) throws Exception {
+    public Map<String, Object> solve(@RequestParam String tiles) throws InvalidTilesException {
+        String tilesNormalized = InputValidator.normalizeTiles(tiles);
         Map<String, Object> res = new LinkedHashMap<>();
-        res.put("tiles", tiles);
-        res.put("groups", service.solve(tiles));
+        res.put("tiles", tilesNormalized);
+        res.put("groups", service.solve(tilesNormalized));
         return res;
     }
 }

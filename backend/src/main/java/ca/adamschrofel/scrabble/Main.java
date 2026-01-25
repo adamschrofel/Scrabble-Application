@@ -11,9 +11,15 @@ public class Main {
         System.out.print("Enter tiles (max 15, ?/* = blank): ");
         String rack = sc.nextLine();
         sc.close();
+        String tiles = "";
+        try {
+            tiles = InputValidator.normalizeTiles(rack);
+        } catch (InvalidTilesException e) {
+            System.out.println(e.getMessage());
+        }
 
         ScrabbleService service = new ScrabbleService();
-        List<WordFinder.LengthGroup> groups = service.solve(rack);
+        List<WordFinder.LengthGroup> groups = service.solve(tiles);
 
         for (WordFinder.LengthGroup g : groups) {
             System.out.println("\n" + g.length + "-letter words:");

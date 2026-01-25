@@ -14,7 +14,8 @@ public class WordFinder {
         }
         loadWordList(wordListPath);
     }
-    //TODO change name 
+
+    // TODO change name
     private void loadWordList(String path) {
         InputStream in = WordFinder.class.getResourceAsStream("/" + path);
 
@@ -25,11 +26,9 @@ public class WordFinder {
 
         try (Scanner kb = new Scanner(in)) {
             while (kb.hasNextLine()) {
-                String line = kb.nextLine().trim();
-                if (line.isEmpty())
+                String word = kb.nextLine().trim();
+                if (word.isEmpty())
                     continue;
-
-                String word = line.toUpperCase();
                 int length = word.length();
                 if (length >= 2 && length <= 15) {
                     wordsByLength[length].add(word);

@@ -1,3 +1,8 @@
+/Users/adamschrofel/Desktop/Projects/Scrabble-Application/backend/src/main/java/ca/adamschrofel/scrabble/DefinitionLoader.java
+/Users/adamschrofel/Desktop/Projects/Scrabble-Application/backend/src/main/java/ca/adamschrofel/scrabble/DefinitionService.java
+/Users/adamschrofel/Desktop/Projects/Scrabble-Application/backend/src/main/java/ca/adamschrofel/scrabble/GlobalExceptionHandler.java
+/Users/adamschrofel/Desktop/Projects/Scrabble-Application/backend/src/main/java/ca/adamschrofel/scrabble/InputValidator.java
+/Users/adamschrofel/Desktop/Projects/Scrabble-Application/backend/src/main/java/ca/adamschrofel/scrabble/InvalidTilesException.java
 /Users/adamschrofel/Desktop/Projects/Scrabble-Application/backend/src/main/java/ca/adamschrofel/scrabble/Main.java
 /Users/adamschrofel/Desktop/Projects/Scrabble-Application/backend/src/main/java/ca/adamschrofel/scrabble/Rack.java
 /Users/adamschrofel/Desktop/Projects/Scrabble-Application/backend/src/main/java/ca/adamschrofel/scrabble/ScrabbleApplication.java
@@ -5,3 +10,4 @@
 /Users/adamschrofel/Desktop/Projects/Scrabble-Application/backend/src/main/java/ca/adamschrofel/scrabble/ScrabbleService.java
 /Users/adamschrofel/Desktop/Projects/Scrabble-Application/backend/src/main/java/ca/adamschrofel/scrabble/TileScoring.java
 /Users/adamschrofel/Desktop/Projects/Scrabble-Application/backend/src/main/java/ca/adamschrofel/scrabble/WordFinder.java
+/Users/adamschrofel/Desktop/Projects/Scrabble-Application/backend/src/main/java/ca/adamschrofel/scrabble/WordScore.java

@@ -49,13 +49,13 @@ export default function App() {
         />
         <button
           onClick={handleSolve}
-          style={{ padding: "10 px 10 px", fontSize: 10 }}
+          style={{ padding: "10px 10px", fontSize: 10 }}
         >
           Solve
         </button>
       </div>
 
-      {error && <p style={{ marginTop: 16 }}>Error: {err}</p>}
+      {error && <p style={{ marginTop: 16 }}>Error: {error}</p>}
 
       {data?.groups && (
         <div style={{ marginTop: 16 }}>

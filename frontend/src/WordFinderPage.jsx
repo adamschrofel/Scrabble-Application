@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import "./App.css";
+import { ui } from "./ui";
 
 export default function WordFinderPage({
   tiles,
@@ -42,66 +42,61 @@ export default function WordFinderPage({
   }
 
   return (
-    <div style={{ maxWidth: 600, margin: "20px auto", padding: 16 }}>
-      <h1>Scrabble Word Finder</h1>
-
-      <div style={{ display: "flex", gap: 10 }}>
-        <input
-          value={tiles}
-          onChange={(e) => setTiles(e.target.value)}
-          onKeyDown={onKeyDown}
-          placeholder="e.g., aeioust"
-          style={{ flex: 1, padding: 10 }}
-        />
-        <button
-          onClick={handleSolve}
-          style={{ padding: "10px 10px", fontSize: 10 }}
-        >
-          Solve
-        </button>
-      </div>
-
-      {error && <p style={{ marginTop: 16 }}>Error: {error}</p>}
-
-      {data?.groups && (
-        <div style={{ marginTop: 16 }}>
-          {data.groups.length === 0 ? (
-            <p>No words found.</p>
-          ) : (
-            data.groups.map((g) => (
-              <div key={g.length} style={{ marginBottom: 16 }}>
-                <h2 style={{ margin: "10px 0" }}>{g.length}-letter words</h2>
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns:
-                      "repeat(auto-fill, minmax(120px, 1fr))",
-                    gap: 6,
-                  }}
-                >
-                  {g.words.map((w) => (
-                    <div
-                      key={w}
-                      onClick={() => navigate(`/define/${w}`)}
-                      style={{
-                        padding: "6px 8px",
-                        border: "1px solid #ddd",
-                        borderRadius: 8,
-                        cursor: "pointer",
-                        textAlign: "center",
-                        background: "#eef",
-                        color: "black",
-                      }}
-                    >
-                      {w}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))
-          )}
+    <div className={ui.page}>
+      <div className={`${ui.container} relative`}>
+        <div className="absolute inset-0 -z-10 rounded-3xl bg-slate-900/30 blur-2xl">
+          <h1 className={ui.h1}>Scrabble Word Finder</h1>
+          <p className="text-sm text-slate-400">
+            Click a word to view its definition
+          </p>
         </div>
-      )}
+
+        <div className={`mt-6 ${ui.card}`}>
+          <div className="flex gap-3">
+            <input
+              className={ui.input}
+              value={tiles}
+              onChange={(e) => setTiles(e.target.value)}
+              onKeyDown={onKeyDown}
+              placeholder="e.g., triedest (?/* = blank)"
+            />
+            <button className={ui.button} onClick={handleSolve}>
+              Solve
+            </button>
+          </div>
+
+          {error && <div className={ui.error}>{error}</div>}
+        </div>
+
+        {data?.groups && (
+          <div className="mt-8 space-y-8">
+            {data.groups.length === 0 ? (
+              <p className="text-slate-300">No words found.</p>
+            ) : (
+              data.groups.map((g) => (
+                <section key={g.length}>
+                  <div className="mb-3 text-sm font-semibold text-slate-400">
+                    {g.length}-letter words
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                    {g.words.map((w) => (
+                      <button
+                        key={w}
+                        onClick={() => navigate(`/define/${w}`)}
+                        className={ui.chip}
+                        title="View definition"
+                      >
+                        {w}
+                      </button>
+                    ))}
+                  </div>
+                </section>
+              ))
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

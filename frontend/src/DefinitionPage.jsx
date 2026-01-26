@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { ui } from "./ui";
 
 export default function DefinitionPage() {
   const { word } = useParams();
-  const [definition, setDefinition] = useState("Loading");
+  const [definition, setDefinition] = useState("Loading...");
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
@@ -12,14 +13,12 @@ export default function DefinitionPage() {
 
     async function loadDefinition() {
       setError("");
-      setDefinition("Loading");
+      setDefinition("Loading...");
 
       try {
         const res = await fetch(`/api/define?word=${encodeURIComponent(word)}`);
-        console.log(res.status);
 
         const json = await res.json();
-        console.log(json);
 
         if (!res.ok || !json.found) {
           return;
@@ -38,14 +37,22 @@ export default function DefinitionPage() {
   }, [word]);
 
   return (
-    <div style={{ maxWidth: 600, margin: "10px", padding: 10 }}>
-      <button onClick={() => navigate(-1)} style={{ marginBottom: 2 }}>
-        Back
-      </button>
+    <div className={ui.page}>
+      <div className={ui.container}>
+        <button className={ui.back} onClick={() => navigate(-1)}>
+          ← Back
+        </button>
 
-      <h1 style={{ marginTop: 2 }}>{word}</h1>
+        <h1 className={`mt-6 ${ui.h1}`}>{word}</h1>
 
-      {error ? <p>Error: {error}</p> : <p>{definition}</p>}
+        <div className={`mt-6 ${ui.card}`}>
+          {error ? (
+            <div className={ui.error}>{error}</div>
+          ) : (
+            <p className="leading-relaxed text-slate-200">{definition}</p>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

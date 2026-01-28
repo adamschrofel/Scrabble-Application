@@ -2,7 +2,7 @@ export const ui = {
   page: "min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-100",
   container: "mx-auto max-w-4xl px-4 py-10",
   card: "rounded-2xl border border-slate-800 bg-slate-900/40 p-5 shadow-sm",
-  h1: "text-3xl font-semibold tracking-tight",
+  h1: "text-5xl sm:text-6xl font-extrabold tracking-tight",
   h2: "text-sm font-semibold text-slate-400",
   input:
     "w-full rounded-xl border border-slate-800 bg-slate-950 px-4 py-3 text-base outline-none placeholder:text-slate-500 focus:border-violet-500",

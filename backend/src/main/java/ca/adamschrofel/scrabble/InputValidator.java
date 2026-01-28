@@ -2,24 +2,41 @@ package ca.adamschrofel.scrabble;
 
 import java.util.*;
 
+/**
+ * Utility class validates and normalizes user input
+ * 
+ * Handles formatting (uppercase conversion, whitespace removal) and validation
+ * (checking for invalid characters, enforcing max tile limit).
+ */
 public class InputValidator {
-
+    // Max number of tiles allowed in a single rack 
     public static final int MAX_TILES = 15;
 
+    /**
+     * Normalizes and validates tile input
+     *
+     * @param input Raw user input string 
+     * @return The normalized tile string ready for word finder
+     * @throws InvalidTilesException If input is empty, exceeds 15 tiles, or contains invalid characters
+     */
     public static String normalizeTiles(String input) throws InvalidTilesException {
-
+        // Trim whitespace and converts to uppercase
         String cleanedInput = input.trim().replaceAll("\\s+", "").toUpperCase();
 
+        // Rejects empty input
         if (cleanedInput.isEmpty()) {
             throw new InvalidTilesException("Please enter tiles (min 2)");
         }
 
+        // Enforce maximum tiles
         if (cleanedInput.length() > MAX_TILES) {
             throw new InvalidTilesException("Too many tiles! Please enter between 2 and 15 tiles.");
         }
 
+        // Checks for invalid characters 
         Set<Character> invalidCharacters = new LinkedHashSet<>();
         for (char c : cleanedInput.toCharArray()) {
+            // Valid characters are A-Z or blank tile symbols (? and *)
             boolean isLetter = (c >= 'A' && c <= 'Z');
             boolean isBlank = (c == '*' || c == '?');
 
@@ -27,11 +44,13 @@ public class InputValidator {
                 invalidCharacters.add(c);
             }
         }
+        
+        // If any invalid characters found, throw exception 
         if (!invalidCharacters.isEmpty()) {
             throw new InvalidTilesException(
                     "Invalid entries: " + invalidCharacters + "Search only accepts A-Z, ?, or *");
         }
+        
         return cleanedInput;
     }
-
 }

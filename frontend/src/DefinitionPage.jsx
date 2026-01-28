@@ -21,6 +21,7 @@ export default function DefinitionPage() {
         const json = await res.json();
 
         if (!res.ok || !json.found) {
+          if(!cancelled) setDefinition("No definition found");
           return;
         }
         if (!cancelled) setDefinition(json.definition);

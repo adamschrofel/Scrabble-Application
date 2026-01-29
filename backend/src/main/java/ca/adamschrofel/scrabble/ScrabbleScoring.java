@@ -42,16 +42,6 @@ public final class ScrabbleScoring {
         }
     }
 
-    /**
-     * Retrieves the point value of a single tile
-     *
-     * @param c The tile character (A-Z, *, or ?)
-     * @return The point value of the tile (0-10)
-     */
-    public static int getTileScore(char c) {
-        return SCORE[c - 'A'];
-    }
-
     public static int scoreLetter(char c) {
         if (c < 'A' || c > 'Z') {
             return 0;
@@ -69,8 +59,8 @@ public final class ScrabbleScoring {
      */
     public static int scoreWord(String word) {
         int total = 0;
-        for (char c : word.toCharArray()) {
-            total += getTileScore(c);
+        for (char c : word.toUpperCase().toCharArray()) {
+            total += scoreLetter(c);
         }
         return total;
     }

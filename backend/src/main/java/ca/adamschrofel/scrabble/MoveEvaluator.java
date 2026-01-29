@@ -1,42 +1,54 @@
 package ca.adamschrofel.scrabble;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class MoveEvaluator {
-    public static MoveEvaluation evaluate(Board board, BoardLayout layout, Placement p, WordFinder dictionary) {
-        if (!board.isLegalPlacement(p)) {
+    public static MoveEvaluation evaluate(Board board, BoardLayout layout, Placement placement, WordFinder dictionary) {
+        if (!board.isLegalPlacement(placement)) {
             return new MoveEvaluation(false, 0, List.of());
         }
 
-        List<PlacedTile> newlyPlaced = board.place(p);
+        List<PlacedTile> newlyPlaced = board.place(placement);
 
         try {
             if (newlyPlaced.isEmpty()) {
                 return new MoveEvaluation(false, 0, List.of());
             }
 
-            String mainWord = p.word().trim();
-            if (!dictionary.isWord(mainWord)) {
-                return new MoveEvaluation(false, 0, List.of());
+            PlacedTile anchor = newlyPlaced.get(0);
+            WordSpan main = buildWordSpan(board, anchor.row(), anchor.column(), placement.direction());
 
+            if (main.word().length() < 2 || !dictionary.isWord(main.word())){
+                return new MoveEvaluation(false, 0, List.of());
             }
 
-            int totalScore = PlacementScorer.scoreMainWord(board, layout, p, newlyPlaced);
+            int totalScore = PlacementScorer.scoreMainWord(board, layout, main, newlyPlaced);
 
             List<String> wordsFormed = new ArrayList<>();
+            wordsFormed.add(main.word());
 
-            wordsFormed.add(mainWord);
+            Direction crossDirection = perpendicular(placement.direction());
+
+            Set<String> seen = new HashSet<>();
 
             for (PlacedTile t : newlyPlaced) {
-                String cross = buildCrossWord(board, p.direction(), t.row(), t.column());
+                WordSpan cross = buildWordSpan(board, t.row(), t.column(), crossDirection);
 
-                if (cross.length() >= 2) {
-                    if (!dictionary.isWord(cross)) {
+                if (cross.word().length() >= 2) {
+                    if (!dictionary.isWord(cross.word())) {
                         return new MoveEvaluation(false, 0, List.of());
                     }
-                    wordsFormed.add(cross);
-                    totalScore += scoreCrossWord(board, layout, cross, p.direction(), t.row(), t.column());
+
+                    String key = cross.word() + "@" + cross.startRow() + "," + cross.startColumn() + ":" + cross.direction();
+                    
+                    if(seen.add(key)){
+                        wordsFormed.add(cross.word());
+                        totalScore += scoreCrossWord(board, layout, cross, t.row(), t.column());
+                    }
+                    
                 }
             }
             return new MoveEvaluation(true, totalScore, wordsFormed);
@@ -46,47 +58,46 @@ public class MoveEvaluator {
         }
     }
 
-    private static String buildCrossWord(Board board, Direction placedDirection, int row, int column) {
-        int dr = (placedDirection == Direction.ACROSS) ? 1 : 0;
-        int dc = (placedDirection == Direction.ACROSS) ? 0 : 1;
-
-        while (inBounds(row - dr, column - dc) && board.getTile(row - dr, column - dc) != '.') {
-            row -= dr;
-            column -= dc;
-
-        }
-
-        StringBuilder sb = new StringBuilder();
-
-        while (inBounds(row, column) && board.getTile(row, column) != '.') {
-            sb.append(board.getTile(row, column));
-            row += dr;
-            column += dc;
-        }
-        return sb.toString();
-    }
-
-    private static int scoreCrossWord(Board board, BoardLayout layout, String crossWord, Direction placedDirection,
-            int row, int column) {
-        int dr = (placedDirection == Direction.ACROSS) ? 1 : 0;
-        int dc = (placedDirection == Direction.ACROSS) ? 0 : 1;
+    private static WordSpan buildWordSpan(Board board, int row, int column, Direction direction){
+        int dr = direction.directionRow;
+        int dc = direction.directionColumn;
 
         int r = row;
         int c = column;
+
         while (inBounds(r - dr, c - dc) && board.getTile(r - dr, c - dc) != '.') {
             r -= dr;
             c -= dc;
 
         }
 
+        StringBuilder sb = new StringBuilder();
+        int r2 = r;
+        int c2 = c;
+        while (inBounds(r2, c2) && board.getTile(r2, c2) != '.') {
+            sb.append(board.getTile(r2, c2));
+            r2 += dr;
+            c2 += dc;
+        }
+        return new WordSpan(sb.toString(), r, c, direction);
+    }
+
+    private static int scoreCrossWord(Board board, BoardLayout layout, WordSpan crossWord, int newRow, int newColumn){
+            int dr = crossWord.direction().directionRow;
+            int dc = crossWord.direction().directionColumn;
+       
+
+        int r = crossWord.startRow();
+        int c = crossWord.startColumn();
+
         int wordMultiplier = 1;
         int total = 0;
 
-        for (int i = 0; i < crossWord.length(); i++) {
+        for (int i = 0; i < crossWord.word().length(); i++) {
             char letter = board.getTile(r, c);
             int letterScore = ScrabbleScoring.scoreLetter(letter);
 
-            if (row == r && c == column) {
+            if (newRow == r && c == newColumn) {
                 TileType tt = layout.getTileType(r, c);
                 letterScore *= tt.letterMultiplier;
                 wordMultiplier *= tt.wordMultiplier;
@@ -97,6 +108,10 @@ public class MoveEvaluator {
             c += dc;
         }
         return total * wordMultiplier;
+    }
+
+    private static Direction perpendicular(Direction direction){
+        return (direction == Direction.ACROSS)? Direction.DOWN : Direction.ACROSS;
     }
 
     private static boolean inBounds(int r, int c) {

@@ -27,7 +27,7 @@ public class Board {
     }
 
     private void checkBoundary(int row, int column) {
-        if (row < 0 || row > SIZE || column < 0 || column > SIZE) {
+        if (row < 0 || row >= SIZE || column < 0 || column >= SIZE) {
             throw new IllegalArgumentException("Out of bounds " + row + ", " + column);
         }
     }
@@ -37,6 +37,7 @@ public class Board {
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
                 sb.append(grid[i][j]);
+                sb.append('\n');
             }
 
         }
@@ -45,7 +46,7 @@ public class Board {
 
     // Placement stuff
     public boolean canPlace(Placement p) {
-        String w = p.word();
+        String w = p.word().toUpperCase();
         // converts direction into tile placement
 
         // compute board coordinates
@@ -60,8 +61,8 @@ public class Board {
             if (x < 0 || x >= SIZE || y < 0 || y >= SIZE) {
                 return false;
             }
+            char placedTile = Character.toUpperCase(w.charAt(i));
             char existingTile = grid[x][y];
-            char placedTile = w.charAt(i);
             // if theres nothing there we can place
             if (existingTile != '.' && existingTile != placedTile)
                 return false;
@@ -75,7 +76,7 @@ public class Board {
             throw new IllegalArgumentException("Illegal Placement");
         }
 
-        String word = p.word();
+        String word = p.word().toUpperCase();
 
         int dr = p.direction().directionRow;
         int dc = p.direction().directionColumn;
@@ -86,8 +87,9 @@ public class Board {
             int x = p.row() + dr * i;
             int y = p.column() + dc * i;
 
+            char placedTile = Character.toUpperCase(word.charAt(i));
             char existingTile = grid[x][y];
-            char placedTile = word.charAt(i);
+            
             if (existingTile == '.') {
                 grid[x][y] = placedTile;
                 newlyPlaced.add(new PlacedTile(x, y, placedTile));
@@ -113,7 +115,7 @@ public class Board {
     // which would signify double word score and start of game
     public boolean coversCenter(Placement p) {
         final int center = 7;
-        String word = p.word();
+        String word = p.word().toUpperCase();
 
         int dr = p.direction().directionRow;
         int dc = p.direction().directionColumn;
@@ -130,7 +132,7 @@ public class Board {
     }
 
     public boolean touchesExistingTile(Placement p) {
-        String word = p.word();
+        String word = p.word().toUpperCase();
 
         int dr = p.direction().directionRow;
         int dc = p.direction().directionColumn;

@@ -42,9 +42,9 @@ Scoring (Step 6)
 - [x] Unit tests for scoring (center DW, DL/TL cases)
 
 Cross-words + dictionary legality (later)
-- [ ] Detect cross-words created by newly placed tiles
-- [ ] Validate all formed words exist in dictionary
-- [ ] Score cross-words and add to total
+- [x] Detect cross-words created by newly placed tiles
+- [x] Validate all formed words exist in dictionary
+- [x] Score cross-words and add to total
 
 Exit criteria:
 - A placement can be evaluated as `{legal, score, wordsFormed}`.

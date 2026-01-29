@@ -3,6 +3,9 @@ package ca.adamschrofel.scrabble;
 import java.util.ArrayList;
 import java.util.List;
 
+import ca.adamschrofel.scrabble.dto.PlacedTile;
+import ca.adamschrofel.scrabble.dto.Placement;
+
 public class Board {
     public static final int SIZE = 15;
     private final char[][] grid = new char[SIZE][SIZE];

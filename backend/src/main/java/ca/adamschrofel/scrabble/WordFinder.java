@@ -346,8 +346,10 @@ public class WordFinder {
                 int j = word.charAt(i) - 'A'; // Convert character to letter index
                 // If this letter has a blank requirement, this is a valid blank position
                 if (blankRequirements[j] > 0) {
-                    blankNeeded[i] = true; // Mark this position as needing a blank
-                    blankMarkers.add(blankNeeded); // Add this configuration to results
+                    boolean[] singleBlank = new boolean[word.length()];
+                    singleBlank[i] = true;
+                     // Mark this position as needing a blank
+                    blankMarkers.add(singleBlank); // Add this configuration to results
                 }
             }
             return blankMarkers;
@@ -391,7 +393,7 @@ public class WordFinder {
                 for (int j = i + 1; j < positions.size(); j++) {
                     blankNeeded = new boolean[word.length()];
                     blankNeeded[positions.get(i)] = true; // First blank position
-                    blankNeeded[positions.get(j)] = true; // Second blank position (note: original code has a bug here)
+                    blankNeeded[positions.get(j)] = true; // Second blank position 
                     blankMarkers.add(blankNeeded);
                 }
             }

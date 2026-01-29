@@ -1,6 +1,10 @@
 package ca.adamschrofel.scrabble;
 
 import org.junit.jupiter.api.Test;
+
+import ca.adamschrofel.scrabble.dto.MoveEvaluation;
+import ca.adamschrofel.scrabble.dto.Placement;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class MoveEvaluatorTest {

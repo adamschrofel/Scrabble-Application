@@ -20,11 +20,15 @@ public class InputValidator {
      * @throws InvalidTilesException If input is empty, exceeds 15 tiles, or contains invalid characters
      */
     public static String normalizeTiles(String input) throws InvalidTilesException {
+
+        if (input == null){
+            throw new InvalidTilesException("Please enter tiles (2 min)");
+        }
         // Trim whitespace and converts to uppercase
         String cleanedInput = input.trim().replaceAll("\\s+", "").toUpperCase();
 
         // Rejects empty input
-        if (cleanedInput.isEmpty()) {
+        if (cleanedInput.length()< 2) {
             throw new InvalidTilesException("Please enter tiles (min 2)");
         }
 

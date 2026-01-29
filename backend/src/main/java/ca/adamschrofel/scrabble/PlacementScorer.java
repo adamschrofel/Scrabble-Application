@@ -4,6 +4,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import ca.adamschrofel.scrabble.dto.PlacedTile;
+import ca.adamschrofel.scrabble.dto.WordSpan;
+
 public class PlacementScorer {
     public static int scoreMainWord(
             Board board,

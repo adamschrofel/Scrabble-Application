@@ -4,6 +4,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import ca.adamschrofel.scrabble.dto.DefinitionResponse;
+import ca.adamschrofel.scrabble.dto.ScoreWord;
+import ca.adamschrofel.scrabble.dto.SolveResponse;
+import ca.adamschrofel.scrabble.dto.WordGroup;
+
 import java.util.*;
 
 /**
@@ -38,35 +43,21 @@ public class ScrabbleController {
      * @throws InvalidTilesException If the input contains invalid characters or exceeds 15 tiles
      */
     @GetMapping("/api/solve")
-    public Map<String, Object> solve(@RequestParam String tiles) throws InvalidTilesException {
+    public SolveResponse solve(@RequestParam String tiles) throws InvalidTilesException {
         // Validate and normalize the tile input (uppercase, no spaces, check for valid chars)
         String tilesNormalized = InputValidator.normalizeTiles(tiles);
 
-        // Build the response object with tiles and grouped word results
-        Map<String, Object> res = new LinkedHashMap<>();
-        res.put("tiles", tilesNormalized);
+        List<WordGroup> groups = new ArrayList<>();
 
-        // Convert WordFinder.LengthGroup (which contains List<String> words)
-        // into API-friendly groups where each word includes its score
-        List<Map<String, Object>> apiGroups = new ArrayList<>();
-        for (WordFinder.LengthGroup g : service.solve(tilesNormalized)) {
-            Map<String, Object> groupMap = new LinkedHashMap<>();
-            groupMap.put("length", g.length);
-
-            // Create a list of WordScore DTOs (word + score)
-            List<ScoreWord> scoredWords = new ArrayList<>();
-            for (String w : g.words) {
-                int score = ScrabbleScoring.scoreWord(w);
-                // Use the ScrabbleScoring helper to ensure scoring logic is centralized
-                scoredWords.add(new ScoreWord(w, score));
+        for (WordFinder.LengthGroup g: service.solve(tilesNormalized)){
+            List<ScoreWord> scored = new ArrayList<>();
+            for (String w : g.words){
+                scored.add(new ScoreWord(w, ScrabbleScoring.scoreWord(w)));
             }
-
-            groupMap.put("words", scoredWords);
-            apiGroups.add(groupMap);
+            groups.add(new WordGroup(g.length, scored));
         }
-
-        res.put("groups", apiGroups);
-        return res;
+        return new SolveResponse(tilesNormalized, groups);
+        
     }
 
     /**
@@ -77,16 +68,11 @@ public class ScrabbleController {
      * @return A map containing the word, whether it was found, and its definition (or null if not found)
      */
     @GetMapping("/api/define")
-    public Map<String, Object> define(@RequestParam String word) {
+    public DefinitionResponse define(@RequestParam String word) {
         // Look up the word in the definitions dictionary
         String definition = definitions.getDefinition(word);
 
-        // Build the response object with definition results
-        Map<String, Object> res = new LinkedHashMap<>();
-        res.put("word", word == null ? null : word.trim().toUpperCase());
-        res.put("found", definition != null);
-        res.put("definition", definition);
-
-        return res;
+        String normalized = word == null? null: word.trim().toUpperCase();
+        return new DefinitionResponse(normalized, definition !=null, definition);
     }
 }

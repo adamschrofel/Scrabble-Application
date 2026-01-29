@@ -7,6 +7,9 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import ca.adamschrofel.scrabble.dto.PlacedTile;
+import ca.adamschrofel.scrabble.dto.Placement;
+
 public class BoardPlacementTest {
     @Test
     void placeWritesTilesAndReturnsNewOnes() {

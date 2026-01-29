@@ -9,23 +9,27 @@ import java.io.*;
  * ARCHITECTURE:
  * - Loads the entire dictionary into memory at startup
  * - Organizes words by length in an array for fast filtering
- * - Uses tile counting logic to determine which words can be formed from a given rack
+ * - Uses tile counting logic to determine which words can be formed from a
+ * given rack
  * - Handles blank tiles (wildcards) with positioning algorithms
  * 
- *  NOTE:
+ * NOTE:
  * - "Real tiles" = actual letter tiles in the player's rack
  * - "Blank tiles" = wildcards (? or *) that can substitute any letter
- * - A word is "playable" if the player has all the letters (or blanks to cover shortages)
+ * - A word is "playable" if the player has all the letters (or blanks to cover
+ * shortages)
  */
 public class WordFinder {
     // Array of 16 ArrayLists (index 0-15), each containing words of that length
     // Index 0-1 are unused (Scrabble min is 2 letters), indices 2-15 contain words
     private final List<String>[] wordsByLength;
+    private final Set<String> allWords = new HashSet<>();
 
     /**
      * Constructor initializes the word finder with dictionary file.
      *
-     * @param wordListPath Path to the word list file on the classpath: dictionary/csw19Words.txt
+     * @param wordListPath Path to the word list file on the classpath:
+     *                     dictionary/csw19Words.txt
      */
     @SuppressWarnings("unchecked")
     public WordFinder(String wordListPath) {
@@ -40,7 +44,8 @@ public class WordFinder {
     }
 
     /**
-     * Loads a word list file from the classpath and populates the wordsByLength array.
+     * Loads a word list file from the classpath and populates the wordsByLength
+     * array.
      * Each word is added to the list at its corresponding length index.
      * Only words between 2-15 characters are included (standard Scrabble rules).
      *
@@ -70,6 +75,7 @@ public class WordFinder {
                 if (length >= 2 && length <= 15) {
                     // Add the word to the appropriate length bucket
                     wordsByLength[length].add(word);
+                    allWords.add(word);
                 }
             }
         }
@@ -82,12 +88,14 @@ public class WordFinder {
      * ALGORITHM:
      * 1. Parse the input string into a Rack object (counts letters, blanks)
      * 2. Iterate from longest possible word length down to 2
-     * 3. For each length, check if each word can be played with available tiles (makesWord check)
+     * 3. For each length, check if each word can be played with available tiles
+     * (makesWord check)
      * 5. Sort results within each length alphabetically
      * 6. Return concatenated results (longest words first)
      *
-     * @param input Raw tile string 
-     * @return List of playable words in descending length order, sorted alphabetically within each length
+     * @param input Raw tile string
+     * @return List of playable words in descending length order, sorted
+     *         alphabetically within each length
      */
     public List<String> findPlayableWords(String input) {
         // Parse the input string into a Rack object
@@ -115,25 +123,27 @@ public class WordFinder {
                 }
             }
 
-            // Sort words within this length group 
+            // Sort words within this length group
             Collections.sort(group);
             // Add all sorted words to the results
             results.addAll(group);
         }
-        
+
         // Return the complete list (longest words first, alphabetically within lengths)
         return results;
     }
 
     /**
      * Groups a list of words by their length.
-     * Converts a flat list of words into LengthGroup objects for JSON serialization.
+     * Converts a flat list of words into LengthGroup objects for JSON
+     * serialization.
      * 
      * ASSUMPTION: The input list is already sorted by length (longest first).
      * This method simply collects consecutive words of the same length.
      *
      * @param playableWords A list of words (assumed sorted by descending length)
-     * @return A list of LengthGroup objects, each containing words of a specific length
+     * @return A list of LengthGroup objects, each containing words of a specific
+     *         length
      */
     public List<LengthGroup> groupPlayableWords(List<String> playableWords) {
         // Initialize the result list
@@ -157,27 +167,29 @@ public class WordFinder {
             // Create a LengthGroup for this length and add to results
             groups.add(new LengthGroup(length, bucket));
         }
-        
+
         // Return the grouped results
         return groups;
     }
 
     /**
      * Determines if a word can be formed from the given rack of tiles.
-     * This is the core logic: checks if the player has (or can blank) all needed letters.
+     * This is the core logic: checks if the player has (or can blank) all needed
+     * letters.
      * 
      * LOGIC:
      * 1. Compute what tiles are needed for the word
      * 2. Calculate how many blanks would be required to cover shortages
      * 3. Return true if needed blanks <= available blanks
      *
-     * @param word The word to check (should be uppercase)
+     * @param word          The word to check (should be uppercase)
      * @param realTileCount Array of tile counts (index 0=A, 1=B, ..., 25=Z)
-     * @param blanks Number of blank/wildcard tiles available
+     * @param blanks        Number of blank/wildcard tiles available
      * @return true if the word can be formed with available tiles, false otherwise
      */
     public static boolean makesWord(String word, int[] realTileCount, int blanks) {
-        // Calculate what tiles are needed for this word and how many blanks would be required
+        // Calculate what tiles are needed for this word and how many blanks would be
+        // required
         RackUsage usage = computeRackUsage(word, realTileCount);
         // The word is playable if we have enough blanks to cover all shortages
         return usage.blanksUsed <= blanks;
@@ -197,7 +209,7 @@ public class WordFinder {
          * Creates a LengthGroup with words of a specific length.
          *
          * @param length The length of all words in the group
-         * @param words List of words of this length (should be sorted)
+         * @param words  List of words of this length (should be sorted)
          */
         public LengthGroup(int length, List<String> words) {
             this.length = length;
@@ -206,7 +218,8 @@ public class WordFinder {
     }
 
     /**
-     * Immutable data class that tracks what tiles are needed to form a specific word.
+     * Immutable data class that tracks what tiles are needed to form a specific
+     * word.
      * Used internally by the word-matching algorithm.
      */
     public static class RackUsage {
@@ -220,9 +233,11 @@ public class WordFinder {
         /**
          * Creates a RackUsage with tile requirement information.
          *
-         * @param letterNeeds Array where index i = how many of letter (A+i) are needed
-         * @param blankRequirements Array where index i = how many blanks needed for letter (A+i)
-         * @param blanksUsed Total blanks needed (sum of blankRequirements)
+         * @param letterNeeds       Array where index i = how many of letter (A+i) are
+         *                          needed
+         * @param blankRequirements Array where index i = how many blanks needed for
+         *                          letter (A+i)
+         * @param blanksUsed        Total blanks needed (sum of blankRequirements)
          */
         RackUsage(int[] letterNeeds, int[] blankRequirements, int blanksUsed) {
             this.letterNeeds = letterNeeds;
@@ -247,7 +262,7 @@ public class WordFinder {
      * - Shortages: A has 0 shortage (have 2, need 1), all others need 0
      * - Result: blanksUsed = 0 (can form without blanks)
      *
-     * @param word The word to analyze (should be uppercase)
+     * @param word          The word to analyze (should be uppercase)
      * @param realTileCount Array of tile counts (index 0=A count, 1=B count, etc.)
      * @return A RackUsage object with detailed requirement information
      */
@@ -266,7 +281,7 @@ public class WordFinder {
         int blanksUsed = 0;
 
         // For each letter, calculate if we have a shortage and need a blank
-        for (int i = 0; i < word.length(); i++) {
+        for (int i = 0; i < 26; i++) {
             // Calculate the shortage: how many more of this letter we need
             int shortage = letterNeeds[i] - realTileCount[i];
             // If we have a shortage, we need blank tiles to cover it
@@ -275,7 +290,7 @@ public class WordFinder {
                 blanksUsed += shortage;
             }
         }
-        
+
         // Return the computed requirements
         return new RackUsage(letterNeeds, blankRequirements, blanksUsed);
     }
@@ -288,17 +303,20 @@ public class WordFinder {
      * - 1 blank: Multiple positions where the blank could be placed
      * - 2 blanks: Complex logic for same-letter or different-letter blanks
      * 
-     * RETURNS: A list of boolean arrays, where each array represents one valid placement.
-     * Each boolean array marks which positions use blank tiles (true) vs. real tiles (false).
+     * RETURNS: A list of boolean arrays, where each array represents one valid
+     * placement.
+     * Each boolean array marks which positions use blank tiles (true) vs. real
+     * tiles (false).
      * 
      * EXAMPLE:
      * - Word: "TRADE" with one blank for 'R'
      * - Returns: [false, true, false, false, false] (blank at position 1)
      *
-     * @param word The word to track blank placements for
+     * @param word          The word to track blank placements for
      * @param realTileCount Array of available tile counts
-     * @param blanks Maximum number of blanks available
-     * @return List of boolean arrays, each representing one valid blank placement configuration
+     * @param blanks        Maximum number of blanks available
+     * @return List of boolean arrays, each representing one valid blank placement
+     *         configuration
      */
     public static List<boolean[]> blanksTracker(String word, int[] realTileCount, int blanks) {
         // Compute what tiles are needed for this word
@@ -306,7 +324,8 @@ public class WordFinder {
         int[] blankRequirements = usage.blankRequirements;
         int blanksUsed = usage.blanksUsed;
 
-        // If the word needs more blanks than available (or more than 2), it's impossible
+        // If the word needs more blanks than available (or more than 2), it's
+        // impossible
         if (blanksUsed > blanks || blanksUsed > 2) {
             return List.of(); // Return empty list (no valid configurations)
         }
@@ -352,7 +371,8 @@ public class WordFinder {
             }
         }
 
-        // CASE 2A: Both blanks are for the SAME letter (e.g., "LETTER" needs 2 blanks for 'E')
+        // CASE 2A: Both blanks are for the SAME letter (e.g., "LETTER" needs 2 blanks
+        // for 'E')
         if (secondLetter == -1) {
             // Convert letter index back to character
             char c = (char) ('A' + firstLetter);
@@ -364,8 +384,9 @@ public class WordFinder {
                     positions.add(i);
                 }
             }
-            
-            // Generate all pairs of positions (all ways to place 2 blanks for the same letter)
+
+            // Generate all pairs of positions (all ways to place 2 blanks for the same
+            // letter)
             for (int i = 0; i < positions.size(); i++) {
                 for (int j = i + 1; j < positions.size(); j++) {
                     blankNeeded = new boolean[word.length()];
@@ -377,7 +398,8 @@ public class WordFinder {
             return blankMarkers;
         }
 
-        // CASE 2B: Blanks are for TWO DIFFERENT letters (e.g., one blank for 'R', one for 'Q')
+        // CASE 2B: Blanks are for TWO DIFFERENT letters (e.g., one blank for 'R', one
+        // for 'Q')
         // Convert letter indices back to characters
         char l1 = (char) ('A' + firstLetter);
         char l2 = (char) ('A' + secondLetter);
@@ -396,40 +418,50 @@ public class WordFinder {
         }
 
         // Generate all combinations of positions (one from each letter)
-        for (int i : positions1){
-            for(int j : positions2){
+        for (int i : positions1) {
+            for (int j : positions2) {
                 blankNeeded = new boolean[word.length()];
-                blankNeeded[i] = true;  // Blank for first letter
-                blankNeeded[j] = true;  // Blank for second letter
+                blankNeeded[i] = true; // Blank for first letter
+                blankNeeded[j] = true; // Blank for second letter
                 blankMarkers.add(blankNeeded);
             }
         }
-        
+
         return blankMarkers;
     }
 
     /**
      * Creates a visual representation of a word with blank tile placements.
-     * Blank tiles (that use wildcards) are shown as underscores, real tiles as letters.
+     * Blank tiles (that use wildcards) are shown as underscores, real tiles as
+     * letters.
      * 
      * EXAMPLE:
      * - Word: "TRADE"
      * - blankNeeded: [false, true, false, false, false] (blank at position 1)
      * - Result: "T_ADE" (underscore shows where the blank is)
      * 
-     * This is useful for UI display to show the user which letters are being played as blanks.
+     * This is useful for UI display to show the user which letters are being played
+     * as blanks.
      *
-     * @param word The word to visualize (should be uppercase)
+     * @param word        The word to visualize (should be uppercase)
      * @param blankNeeded Boolean array indicating which positions use blanks
      * @return Visual string with '_' for blanks and letters for real tiles
      */
-    public static String blankVisualizer(String word, boolean[] blankNeeded){
+    public static String blankVisualizer(String word, boolean[] blankNeeded) {
         StringBuilder sb = new StringBuilder();
         // For each position in the word
-        for (int i = 0; i<word.length(); i++){
+        for (int i = 0; i < word.length(); i++) {
             // If this position uses a blank, append underscore; otherwise append the letter
-            sb.append(blankNeeded[i]? '_': word.charAt(i));
+            sb.append(blankNeeded[i] ? '_' : word.charAt(i));
         }
         return sb.toString();
     }
+
+    public boolean isWord(String word) {
+        if (word == null) {
+            return false;
+        }
+        return allWords.contains(word.trim().toUpperCase());
+    }
+
 }

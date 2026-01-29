@@ -30,13 +30,13 @@ public class Main {
         Scanner sc = new Scanner(System.in);
         System.out.print("Enter tiles (max 15, ?/* = blank): ");
 
-        String rack = sc.nextLine();
+        String input = sc.nextLine();
         sc.close();
 
         String tiles = "";
         // Validate the input
         try {
-            tiles = InputValidator.normalizeTiles(rack);
+            tiles = InputValidator.normalizeTiles(input);
         } catch (InvalidTilesException e) {
             // If validation fails
             System.out.println(e.getMessage());
@@ -47,14 +47,53 @@ public class Main {
         ScrabbleService service = new ScrabbleService();
         // Solve the rack and get words grouped by length
         List<WordFinder.LengthGroup> groups = service.solve(tiles);
-
+        ScrabbleScoring ss = new ScrabbleScoring();
         // Display results organized by word length
         for (WordFinder.LengthGroup g : groups) {
             System.out.println("\n" + g.length + "-letter words:");
             // Print each word in the group (already sorted)
             for (String w : g.words) {
-                System.out.println("  " + w);
+                int wordScore = ss.scoreWord(w);
+                System.out.println("  " + w + " "+ wordScore);
             }
         }
+        Rack rack = Rack.parseRack(tiles);
+        int[] tileCounts = rack.getCounts();
+        int availableBlanks = rack.getBlanks();
+
+        // Try a few hand-picked words (must be uppercase to match your indexing)
+        List<String> testWords = List.of(
+                "AIR",     // 0 blanks
+                "ARIEL",   // needs E -> 1 blank
+                "LAIR",    // 0 blanks
+                "REALER",    // needs E -> 1 blank
+                "EEL"      // needs 2 E's -> likely impossible with this rack
+        );
+
+        System.out.println("Rack: " + tiles);
+        System.out.println("Available blanks: " + availableBlanks);
+        System.out.println();
+
+        for (String word : testWords) {
+            boolean can = WordFinder.makesWord(word, tileCounts, availableBlanks);
+            System.out.println(word + " canFormWord = " + can);
+
+            List<boolean[]> masks = WordFinder.blanksTracker(word, tileCounts, availableBlanks);
+            System.out.println("  masks: " + masks.size());
+
+            for (boolean[] mask : masks) {
+                System.out.println("   - " + WordFinder.blankVisualizer(word, mask)
+                        + "  positions=" + blankPositions(mask));
+            }
+            System.out.println();
+        }
+    }
+
+    private static List<Integer> blankPositions(boolean[] mask) {
+        ArrayList<Integer> pos = new ArrayList<>();
+        for (int i = 0; i < mask.length; i++) {
+            if (mask[i]) pos.add(i);
+        }
+        return pos;
     }
 }

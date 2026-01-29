@@ -35,19 +35,29 @@ public final class ScrabbleScoring {
         // For each letter in the input string, set its score in the array
         for (int i = 0; i < letters.length(); i++) {
             char c = letters.charAt(i);
+            if (c < 'A' || c > 'Z')
+                continue;
             // Convert character to array index (A=0, B=1, ..., Z=25)
             SCORE[c - 'A'] = value;
         }
     }
 
     /**
-     * Retrieves the point value of a single tile 
+     * Retrieves the point value of a single tile
      *
      * @param c The tile character (A-Z, *, or ?)
      * @return The point value of the tile (0-10)
      */
     public static int getTileScore(char c) {
         return SCORE[c - 'A'];
+    }
+
+    public static int scoreLetter(char c) {
+        if (c < 'A' || c > 'Z') {
+            return 0;
+        }
+        return SCORE[c - 'A'];
+
     }
 
     /**

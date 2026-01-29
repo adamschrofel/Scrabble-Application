@@ -80,12 +80,15 @@ export default function WordFinderPage({
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
                   {g.words.map((w) => (
                     <button
-                      key={w}
-                      onClick={() => navigate(`/define/${w}`)}
+                      key={w.word}
+                      onClick={() => navigate(`/define/${w.word}`)}
                       className={ui.chip}
-                      title="View definition"
+                      title={`Score: ${w.score}`}
                     >
-                      {w}
+                      <div className="flex items-center justify-between">
+                        <span>{w.word}</span>
+                        <span className="ml-2 text-sm text-slate-400">{w.score}</span>
+                      </div>
                     </button>
                   ))}
                 </div>

@@ -45,7 +45,27 @@ public class ScrabbleController {
         // Build the response object with tiles and grouped word results
         Map<String, Object> res = new LinkedHashMap<>();
         res.put("tiles", tilesNormalized);
-        res.put("groups", service.solve(tilesNormalized));
+
+        // Convert WordFinder.LengthGroup (which contains List<String> words)
+        // into API-friendly groups where each word includes its score
+        List<Map<String, Object>> apiGroups = new ArrayList<>();
+        for (WordFinder.LengthGroup g : service.solve(tilesNormalized)) {
+            Map<String, Object> groupMap = new LinkedHashMap<>();
+            groupMap.put("length", g.length);
+
+            // Create a list of WordScore DTOs (word + score)
+            List<ScoreWord> scoredWords = new ArrayList<>();
+            for (String w : g.words) {
+                int score = ScrabbleScoring.scoreWord(w);
+                // Use the ScrabbleScoring helper to ensure scoring logic is centralized
+                scoredWords.add(new ScoreWord(w, score));
+            }
+
+            groupMap.put("words", scoredWords);
+            apiGroups.add(groupMap);
+        }
+
+        res.put("groups", apiGroups);
         return res;
     }
 

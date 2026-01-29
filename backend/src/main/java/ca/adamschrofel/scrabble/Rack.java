@@ -89,6 +89,10 @@ public class Rack {
                 throw new IllegalArgumentException(
                         "15 tiles max");
             }
+
+            if(blanks> 2){
+                throw new IllegalArgumentException("Only 2 blanks max");
+            }
         }
 
         // Create and return a new immutable Rack

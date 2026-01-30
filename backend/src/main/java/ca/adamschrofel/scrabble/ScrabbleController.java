@@ -70,9 +70,10 @@ public class ScrabbleController {
     @GetMapping("/api/define")
     public DefinitionResponse define(@RequestParam String word) {
         // Look up the word in the definitions dictionary
-        String definition = definitions.getDefinition(word);
+        
 
         String normalized = word == null? null: word.trim().toUpperCase();
+        String definition = (normalized == null) ? null : definitions.getDefinition(normalized);
         return new DefinitionResponse(normalized, definition !=null, definition);
     }
 }

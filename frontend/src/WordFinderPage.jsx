@@ -47,9 +47,21 @@ export default function WordFinderPage({
         <div className="absolute inset-0 -z-10 rounded-3xl bg-slate-900/30 blur-2xl" />
 
         <Link to="/" className="inline-block">
-          <h1 className={ui.h1}>Scrabble Word Finder</h1>
+          <h1 className={ui.h1}>Scrabble Helpers</h1>
         </Link>
-        <p className="mt-2 text-slate-300">Choose tool</p>
+        <p className="mt-2 text-slate-300">
+          Choose a tool: Check if a word is valid, 
+          solve a board, or simply find words to play by providing your letters!
+        </p>
+
+        <div className="mt-4 flex flex-wrap gap-3">
+          <Link className={ui.back} to="/check">
+            Word checker
+          </Link>
+          <Link className={ui.back} to="/board">
+            Board solver
+          </Link>
+        </div>
 
         <div className={`mt-6 ${ui.card}`}>
           <div className="flex gap-3">
@@ -67,10 +79,11 @@ export default function WordFinderPage({
 
           {error && <div className={ui.error}>{error}</div>}
         </div>
+
         {data?.groups && (
           <div className="mt-8 space-y-8">
             {data.groups.length === 0 ? (
-              <p className="text-slate-300">No words found.</p>
+              <p className="text-slate-300">No words found!</p>
             ) : (
               data.groups.map((g) => (
                 <section key={g.length}>

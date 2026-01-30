@@ -45,7 +45,6 @@ export default function WordFinderPage({
     <div className={ui.page}>
       <div className={`${ui.container} relative`}>
         <div className="absolute inset-0 -z-10 rounded-3xl bg-slate-900/30 blur-2xl" />
-
         <Link to="/" className="inline-block">
           <h1 className={ui.h1}>Scrabble Helpers</h1>
         </Link>

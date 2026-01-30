@@ -348,7 +348,7 @@ public class WordFinder {
                 if (blankRequirements[j] > 0) {
                     boolean[] singleBlank = new boolean[word.length()];
                     singleBlank[i] = true;
-                     // Mark this position as needing a blank
+                    // Mark this position as needing a blank
                     blankMarkers.add(singleBlank); // Add this configuration to results
                 }
             }
@@ -393,7 +393,7 @@ public class WordFinder {
                 for (int j = i + 1; j < positions.size(); j++) {
                     blankNeeded = new boolean[word.length()];
                     blankNeeded[positions.get(i)] = true; // First blank position
-                    blankNeeded[positions.get(j)] = true; // Second blank position 
+                    blankNeeded[positions.get(j)] = true; // Second blank position
                     blankMarkers.add(blankNeeded);
                 }
             }
@@ -464,6 +464,13 @@ public class WordFinder {
             return false;
         }
         return allWords.contains(word.trim().toUpperCase());
+    }
+
+    public List<String> wordsOfLength(int length) {
+        if (length < 0 || length >= wordsByLength.length) {
+            return List.of();
+        }
+        return wordsByLength[length];
     }
 
 }

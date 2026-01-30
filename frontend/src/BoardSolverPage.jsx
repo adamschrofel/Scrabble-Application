@@ -1,55 +1,146 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ui } from "./ui";
 
-const emptyBoard = Array.from({ length: 15 }, () => "_".repeat(15)).join("\n");
+const SIZE = 15;
+
+
+const emptyBoardText = Array.from({ length: SIZE }, () =>
+  ".".repeat(SIZE),
+).join("\n");
+
+function rowsToText(rows) {
+  return (rows ?? []).join("\n");
+}
+
+function textToTiles(boardText) {
+  const raw = (boardText ?? "").replace(/\r/g, ""); // handle Windows newlines
+  const trimmed = raw.trim();
+
+  // SHORTHAND: if they typed just a single word (no newlines), place it on center row
+  if (!trimmed.includes("\n")) {
+    const word = trimmed.toUpperCase().replace(/[^A-Z]/g, "");
+    const tiles = [];
+    if (!word) return tiles;
+
+    const row = 7; // center row
+    const startCol = Math.max(
+      0,
+      Math.min(15 - word.length, 7 - Math.floor(word.length / 2)),
+    );
+
+    for (let i = 0; i < word.length; i++) {
+      tiles.push({ row, column: startCol + i, tile: word[i] });
+    }
+    return tiles;
+  }
+
+  // NORMAL MODE: 15x15 grid text
+  const lines = raw.split("\n");
+  const padded = Array.from({ length: SIZE }, (_, r) =>
+    (lines[r] ?? "").padEnd(SIZE, ".").slice(0, SIZE),
+  );
+
+  const tiles = [];
+  for (let r = 0; r < SIZE; r++) {
+    for (let c = 0; c < SIZE; c++) {
+      const ch = padded[r][c] ?? ".";
+      const up = ch.toUpperCase();
+      if (up >= "A" && up <= "Z") {
+        tiles.push({ row: r, column: c, tile: up });
+      }
+    }
+  }
+  return tiles;
+}
 
 export default function BoardSolverPage() {
   const [rack, setRack] = useState("");
-  const [board, setBoard] = useState(emptyBoard);
-  const [result, setResult] = useState(null);
+  const [board, setBoard] = useState(emptyBoardText);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  async function handleSolve() {
-    const trimmedRack = rack.trim();
-    const trimmedBoard = board.trim();
+  async function loadBoard() {
+    const res = await fetch("/api/board");
+    const json = await res.json();
+    if (!res.ok) throw new Error(json?.message || `Failed ${res.status}`);
+    setBoard(rowsToText(json.rows));
+  }
 
-    if (!trimmedRack) {
-      setError("Enter rack tiles");
-      setResult(null);
-    }
+  useEffect(() => {
+    loadBoard().catch((e) => setError(e.message));
+  }, []);
 
-    if (!trimmedBoard) {
-      setError("Enter board layout");
-      setResult(null);
-    }
-
+  async function handleReset() {
     setError("");
     setLoading(true);
-    setResult(null);
-
     try {
-      const res = await fetch("//api/board/solve", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          rack: trimmedRack,
-          board: trimmedBoard,
-        }),
-      });
-
+      const res = await fetch("/api/board/reset", { method: "POST" });
       const json = await res.json();
-
-      if (!res.ok) {
-        throw new Error(json?.message || `Failed ${res.status}`);
-      }
-      setResult(json);
+      if (!res.ok) throw new Error(json?.message || `Failed ${res.status}`);
+      setBoard(rowsToText(json.rows));
     } catch (e) {
       setError(e.message);
     } finally {
       setLoading(false);
     }
+  }
+
+  async function handleApplyBoard() {
+    console.log("APPLY CLICKED", { loading, boardLen: board.length });
+
+    const trimmedBoard = (board ?? "").trimEnd();
+    if (!trimmedBoard) {
+      setError("Enter board layout");
+      return;
+    }
+
+    setError("");
+    setLoading(true);
+    try {
+      const tiles = textToTiles(trimmedBoard);
+      console.log("BOARD TEXT:", JSON.stringify(trimmedBoard));
+      console.log("TILES LENGTH:", tiles.length);
+      console.log("PAYLOAD:", JSON.stringify({ tiles }).slice(0, 300));
+      const res = await fetch("/api/board/tiles", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tiles }),
+      });
+
+      const json = await res.json();
+      if (!res.ok) throw new Error(json?.message || `Failed ${res.status}`);
+
+      // use backend's canonical representation
+      setBoard(rowsToText(json.rows));
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleRefresh() {
+    setError("");
+    setLoading(true);
+    try {
+      await loadBoard();
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function handleSolve() {
+    const trimmedRack = rack.trim();
+    if (!trimmedRack) {
+      setError("Enter rack tiles");
+      return;
+    }
+    setError(
+      "Solve not implemented yet: you don’t have /api/board/solve on the backend. Use Apply/Reset/Refresh to test the board for now.",
+    );
   }
 
   return (
@@ -60,10 +151,12 @@ export default function BoardSolverPage() {
         </Link>
 
         <h1 className={`mt-6 ${ui.h1}`}>Board Solver</h1>
+
         <div className={`mt-6 ${ui.card}`}>
           <label className={ui.label} htmlFor="rack-input">
-            Rack tiles
+            Rack tiles (for later)
           </label>
+
           <div className="mt-2 flex gap-3">
             <input
               id="rack-input"
@@ -77,12 +170,15 @@ export default function BoardSolverPage() {
               onClick={handleSolve}
               disabled={loading}
             >
-              {loading ? "Solving..." : "Solve board"}
+              Solve board
             </button>
           </div>
+
           <label className={`${ui.label} mt-6`} htmlFor="board-input">
-            Board layout
+            Board layout (15 lines × 15 chars). Letters are tiles; use '.' or
+            '_' for empty.
           </label>
+
           <textarea
             id="board-input"
             className={`${ui.textarea} mt-2`}
@@ -91,19 +187,34 @@ export default function BoardSolverPage() {
             onChange={(e) => setBoard(e.target.value)}
           />
 
+          <div className="mt-3 flex flex-wrap gap-3">
+            <button
+              className={ui.button}
+              onClick={handleApplyBoard}
+              disabled={loading}
+            >
+              {loading ? "Applying..." : "Apply to backend"}
+            </button>
+
+            <button
+              className={ui.back}
+              onClick={handleReset}
+              disabled={loading}
+            >
+              Reset board
+            </button>
+
+            <button
+              className={ui.back}
+              onClick={handleRefresh}
+              disabled={loading}
+            >
+              Refresh from backend
+            </button>
+          </div>
+
           {error && <div className={ui.error}>{error}</div>}
         </div>
-
-        {result && (
-          <div className={`mt-6 ${ui.card}`}>
-            <div className="text-sm font-semibold text-slate-400">
-              Best move suggestion
-            </div>
-            <pre className="mt-3 whitespace-pre-wrap text-slate-200">
-              {JSON.stringify(result, null, 2)}
-            </pre>
-          </div>
-        )}
       </div>
     </div>
   );

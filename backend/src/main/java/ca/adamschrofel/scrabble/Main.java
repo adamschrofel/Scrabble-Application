@@ -2,6 +2,8 @@ package ca.adamschrofel.scrabble;
 
 import java.util.*;
 
+import ca.adamschrofel.scrabble.Exceptions.InvalidTilesException;
+
 /**
  * Command-line interface (CLI) for the Scrabble Word Finder application.
  * Allows users to input a rack of tiles and see valid playable words.

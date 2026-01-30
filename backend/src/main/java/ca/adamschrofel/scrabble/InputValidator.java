@@ -2,6 +2,8 @@ package ca.adamschrofel.scrabble;
 
 import java.util.*;
 
+import ca.adamschrofel.scrabble.Exceptions.InvalidTilesException;
+
 /**
  * Utility class validates and normalizes user input
  * 

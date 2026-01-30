@@ -1,4 +1,4 @@
-package ca.adamschrofel.scrabble;
+package ca.adamschrofel.scrabble.Exceptions;
 
 /**
  * Custom exception thrown when user input contains invalid tile characters or violates constraints.

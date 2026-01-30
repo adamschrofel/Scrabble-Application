@@ -1,4 +1,4 @@
-package ca.adamschrofel.scrabble;
+package ca.adamschrofel.scrabble.Exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +35,13 @@ public class GlobalExceptionHandler {
         // Return a structured error response as JSON
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                 Map.of("error", "INVALID_TILES",
+                        "message", e.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidBoardException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidBoard(InvalidBoardException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                Map.of("error", "INVALID_BOARD",
                         "message", e.getMessage()));
     }
 }

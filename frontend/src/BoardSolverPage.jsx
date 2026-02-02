@@ -139,7 +139,7 @@ export default function BoardSolverPage() {
       return;
     }
     setError(
-      "Solve not implemented yet: you don’t have /api/board/solve on the backend. Use Apply/Reset/Refresh to test the board for now.",
+      "Solve yet implemented",
     );
   }
 

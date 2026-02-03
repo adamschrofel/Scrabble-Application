@@ -19,8 +19,7 @@ public class ScrabbleService {
 
     // WordFinder handles the core algorithm for finding playable words
     private final WordFinder wf;
-    // ScrabbleScoring provides point values for tiles (currently unused)
-    private final ScrabbleScoring ss;
+    
 
     /**
      * Constructor that initializes the service.
@@ -28,7 +27,6 @@ public class ScrabbleService {
      */
     public ScrabbleService() {
         this.wf = new WordFinder(DICT_PATH);
-        this.ss = new ScrabbleScoring();
     }
 
     /**
@@ -52,7 +50,6 @@ public class ScrabbleService {
         MoveGenerator gen = new MoveGenerator();
         BoardLayout layout = BoardLayout.standardLayout();
         
-
         String tilesNormalized = InputValidator.normalizeTiles(rack);
 
         return gen.generateBestPlays(board, layout, this.wf, tilesNormalized, limit);

@@ -12,6 +12,17 @@ public class BoardService {
         reset();
     }
 
+    public synchronized Board setupStandardBoard() {
+        Board b = new Board();
+        for (int row = 0; row < SIZE; row++) {
+            for (int column = 0; column < SIZE; column++) {
+                b.setTile(row, column, grid[row][column]);
+            }
+        }
+        return b;
+
+    }
+
     public synchronized void reset() {
         for (int row = 0; row < SIZE; row++) {
             for (int column = 0; column < SIZE; column++) {

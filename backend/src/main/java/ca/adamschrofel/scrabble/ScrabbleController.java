@@ -96,19 +96,8 @@ public class ScrabbleController {
     @GetMapping("/api/bestplays")
     public List<BestPlay> bestPlays(
             @RequestParam String tiles,
-            @RequestParam(defaultValue = "50") int limit) throws InvalidTilesException {
-
-        // Build a Board object from the current BoardService state
-        Board b = new Board();
-        String[] rows = board.rowsAsStrings();
-
-        for (int r = 0; r < rows.length; r++) {
-            String row = rows[r];
-            for (int c = 0; c < row.length(); c++) {
-                char ch = row.charAt(c);
-                b.setTile(r, c, ch); 
-            }
-        }
+            @RequestParam(defaultValue = "25") int limit) throws InvalidTilesException {
+        Board b = board.setupStandardBoard();
 
         // Delegate to service (which knows dictionary/layout)
         return service.bestPlays(b, tiles, limit);

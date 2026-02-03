@@ -24,19 +24,8 @@ public class MoveGenerator {
             WordFinder dictionary,
             String rack,
             int limit) {
-        int candAcross = 0, candDown = 0;
-        int legalAcross = 0, legalDown = 0;
-        int keptAcross = 0, keptDown = 0;
 
         List<Placement> candidates = generateCandidatePlacements(board, dictionary, rack);
-
-        for (Placement p : candidates) {
-            if (p.direction() == Direction.ACROSS)
-                candAcross++;
-            else
-                candDown++;
-        }
-        System.out.println("CANDIDATES: across=" + candAcross + " down=" + candDown);
 
         List<BestPlay> plays = new ArrayList<>();
         Set<String> seen = new HashSet<>();
@@ -47,37 +36,20 @@ public class MoveGenerator {
             if (!seen.add(key)) {
                 continue;
             }
-
             MoveEvaluation eval = MoveEvaluator.evaluate(board, layout, p, dictionary);
             if (!eval.legal()) {
                 continue;
             }
-
-            if (p.direction() == Direction.ACROSS) {
-                legalAcross++;
-            } else {
-                legalDown++;
-            }
-
             List<PlacedTile> tilesPlaced = computeTilesPlaced(board, p);
             if (tilesPlaced.isEmpty()) {
-                continue; // shouldn't happen because MoveEvaluator checks this too
+                continue;
             }
-
             plays.add(new BestPlay(p, eval.score(), eval.wordsFormed(), tilesPlaced));
-            if (p.direction() == Direction.ACROSS) {
-                keptAcross++;
-            } else {
-                keptDown++;
-            }
-
         }
-        System.out.println("LEGAL: across=" + legalAcross + " down=" + legalDown);
-        System.out.println("KEPT:  across=" + keptAcross + " down=" + keptDown);
 
         plays.sort(Comparator.comparingInt(BestPlay::score).reversed());
-        if (limit > 0 || plays.size() > limit) {
-            return plays;
+        if(limit > 0 && plays.size()> limit){
+            return new ArrayList<>(plays.subList(0, limit));
         }
         return plays;
     }

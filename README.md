@@ -33,14 +33,8 @@ This project started as a Java command-line tool and has evolved into a web appl
 
 ---
 
-
-
 ## Running the Project Locally
 
-
-npm run dev (from project root)
-
-### Backend
 ```bash
 git clone https://github.com/adamschrofel/Scrabble-Application.git
 cd Scrabble-Application
@@ -58,7 +52,7 @@ React frontend on http://localhost:5173
 ```
 ## Project Status
 
-This project is released as a **v1** focused on correctness and usability.
+This project is released as a **v1** focused usability.
 Performance optimizations and feature improvements are tracked in GitHub Issues.
 
 Motivation

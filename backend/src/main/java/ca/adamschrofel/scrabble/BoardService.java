@@ -1,7 +1,7 @@
 package ca.adamschrofel.scrabble;
 
 import org.springframework.stereotype.Service;
-
+// TODO(#2) add comments
 @Service
 public class BoardService {
     public static final int SIZE = 15;

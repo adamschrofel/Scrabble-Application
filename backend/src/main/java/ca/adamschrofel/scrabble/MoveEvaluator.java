@@ -15,7 +15,7 @@ public class MoveEvaluator {
         if (!board.isLegalPlacement(placement)) {
             return new MoveEvaluation(false, 0, List.of());
         }
-
+        // temporarily place tiles so we can score and validate cross words
         List<PlacedTile> newlyPlaced = board.place(placement);
 
         try {
@@ -30,6 +30,7 @@ public class MoveEvaluator {
                 return new MoveEvaluation(false, 0, List.of());
             }
 
+            // score the main word and add any valid cross words
             int totalScore = PlacementScorer.scoreMainWord(board, layout, main, newlyPlaced);
 
             List<String> wordsFormed = new ArrayList<>();
@@ -51,6 +52,7 @@ public class MoveEvaluator {
                     
                     if(seen.add(key)){
                         wordsFormed.add(cross.word());
+                        // only newly placed tiles get multipliers for crosswords
                         totalScore += scoreCrossWord(board, layout, cross, t.row(), t.column());
                     }
                     
@@ -69,7 +71,7 @@ public class MoveEvaluator {
 
         int r = row;
         int c = column;
-
+        // walk backwards to find the start of the word span
         while (inBounds(r - dr, c - dc) && board.getTile(r - dr, c - dc) != '.') {
             r -= dr;
             c -= dc;
@@ -79,6 +81,7 @@ public class MoveEvaluator {
         StringBuilder sb = new StringBuilder();
         int r2 = r;
         int c2 = c;
+        // collect continuous letters going forward to form the word
         while (inBounds(r2, c2) && board.getTile(r2, c2) != '.') {
             sb.append(board.getTile(r2, c2));
             r2 += dr;

@@ -6,11 +6,15 @@ import java.util.List;
 import ca.adamschrofel.scrabble.dto.PlacedTile;
 import ca.adamschrofel.scrabble.dto.Placement;
 
+/**
+ * TODO(#1) finish commenting file
+ */
 public class Board {
     public static final int SIZE = 15;
     private final char[][] grid = new char[SIZE][SIZE];
 
     public Board() {
+        // initialize board with empty tiles
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
                 grid[i][j] = '.';
@@ -18,6 +22,7 @@ public class Board {
         }
     }
 
+    
     public char getTile(int row, int column) {
         checkBoundary(row, column);
         return grid[row][column];
@@ -40,7 +45,6 @@ public class Board {
     public boolean canPlace(Placement p) {
         String w = p.word().toUpperCase();
         // converts direction into tile placement
-
         // compute board coordinates
         int dr = p.direction().directionRow;
         int dc = p.direction().directionColumn;
@@ -90,7 +94,7 @@ public class Board {
         return newlyPlaced;
 
     }
-
+    // TODO: track occupied tile count so it doesnt scan for emptiness
     // checks if tile is empty
     public boolean isEmpty() {
         for (int i = 0; i < SIZE; i++) {

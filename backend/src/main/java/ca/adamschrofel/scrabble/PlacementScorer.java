@@ -38,6 +38,7 @@ public class PlacementScorer {
 
             if (isNew) {
                 TileType tt = layout.getTileType(row, column);
+                System.out.println("MAIN (" + row + "," + column + ") " + letter + " tile=" + tt);
                 letterScore *= tt.letterMultiplier;
                 wordMultiplier *= tt.wordMultiplier;
             }

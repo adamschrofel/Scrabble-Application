@@ -23,9 +23,20 @@ public class MoveGenerator {
             BoardLayout layout,
             WordFinder dictionary,
             String rack,
-            int limit
-    ) {
+            int limit) {
+        int candAcross = 0, candDown = 0;
+        int legalAcross = 0, legalDown = 0;
+        int keptAcross = 0, keptDown = 0;
+
         List<Placement> candidates = generateCandidatePlacements(board, dictionary, rack);
+
+        for (Placement p : candidates) {
+            if (p.direction() == Direction.ACROSS)
+                candAcross++;
+            else
+                candDown++;
+        }
+        System.out.println("CANDIDATES: across=" + candAcross + " down=" + candDown);
 
         List<BestPlay> plays = new ArrayList<>();
         Set<String> seen = new HashSet<>();
@@ -33,21 +44,42 @@ public class MoveGenerator {
         for (Placement p : candidates) {
             // de-dupe identical placements
             String key = p.word() + "@" + p.row() + "," + p.column() + ":" + p.direction();
-            if (!seen.add(key)) continue;
+            if (!seen.add(key)) {
+                continue;
+            }
 
             MoveEvaluation eval = MoveEvaluator.evaluate(board, layout, p, dictionary);
-            if (!eval.legal()) continue;
+            if (!eval.legal()) {
+                continue;
+            }
+
+            if (p.direction() == Direction.ACROSS) {
+                legalAcross++;
+            } else {
+                legalDown++;
+            }
 
             List<PlacedTile> tilesPlaced = computeTilesPlaced(board, p);
-            if (tilesPlaced.isEmpty()) continue; // shouldn't happen because MoveEvaluator checks this too
+            if (tilesPlaced.isEmpty()) {
+                continue; // shouldn't happen because MoveEvaluator checks this too
+            }
 
             plays.add(new BestPlay(p, eval.score(), eval.wordsFormed(), tilesPlaced));
+            if (p.direction() == Direction.ACROSS) {
+                keptAcross++;
+            } else {
+                keptDown++;
+            }
+
         }
+        System.out.println("LEGAL: across=" + legalAcross + " down=" + legalDown);
+        System.out.println("KEPT:  across=" + keptAcross + " down=" + keptDown);
 
-        
-
-        if (limit <= 0 || plays.size() <= limit) return plays;
-        return plays.subList(0, limit);
+        plays.sort(Comparator.comparingInt(BestPlay::score).reversed());
+        if (limit > 0 || plays.size() > limit) {
+            return plays;
+        }
+        return plays;
     }
 
     /**
@@ -57,8 +89,7 @@ public class MoveGenerator {
     public List<Placement> generateCandidatePlacements(
             Board board,
             WordFinder dictionary,
-            String rack
-    ) {
+            String rack) {
         List<Placement> out = new ArrayList<>();
         List<Anchor> anchors = findAnchors(board);
 
@@ -72,9 +103,11 @@ public class MoveGenerator {
         return out;
     }
 
-    /* ======================
-       PRIVATE ENGINE HELPERS
-       ====================== */
+    /*
+     * ======================
+     * PRIVATE ENGINE HELPERS
+     * ======================
+     */
 
     private List<Anchor> findAnchors(Board board) {
         List<Anchor> anchors = new ArrayList<>();
@@ -86,7 +119,8 @@ public class MoveGenerator {
 
         for (int r = 0; r < Board.SIZE; r++) {
             for (int c = 0; c < Board.SIZE; c++) {
-                if (board.getTile(r, c) != '.') continue;
+                if (board.getTile(r, c) != '.')
+                    continue;
 
                 if (hasTileAt(board, r - 1, c)
                         || hasTileAt(board, r + 1, c)
@@ -105,8 +139,7 @@ public class MoveGenerator {
             String rack,
             Anchor anchor,
             Direction dir,
-            List<Placement> out
-    ) {
+            List<Placement> out) {
         int ar = anchor.row();
         int ac = anchor.col();
 
@@ -157,9 +190,11 @@ public class MoveGenerator {
         int len = w.length();
 
         if (dir == Direction.ACROSS) {
-            if (col < 0 || col + len > Board.SIZE) return false;
+            if (col < 0 || col + len > Board.SIZE)
+                return false;
         } else {
-            if (row < 0 || row + len > Board.SIZE) return false;
+            if (row < 0 || row + len > Board.SIZE)
+                return false;
         }
 
         Map<Character, Integer> counts = rackCounts(rack);
@@ -173,7 +208,8 @@ public class MoveGenerator {
             char existing = board.getTile(r, c);
 
             if (existing != '.') {
-                if (existing != needed) return false;
+                if (existing != needed)
+                    return false;
                 continue;
             }
 
@@ -191,7 +227,8 @@ public class MoveGenerator {
     }
 
     /**
-     * Compute which tiles would be newly placed for this placement (without mutating board).
+     * Compute which tiles would be newly placed for this placement (without
+     * mutating board).
      * This is UI-critical (so we can highlight the squares to place).
      */
     private List<PlacedTile> computeTilesPlaced(Board board, Placement placement) {
@@ -221,16 +258,19 @@ public class MoveGenerator {
         Map<Character, Integer> m = new HashMap<>();
         for (int i = 0; i < rack.length(); i++) {
             char ch = Character.toUpperCase(rack.charAt(i));
-            if (ch == ' ') continue;
+            if (ch == ' ')
+                continue;
             m.put(ch, m.getOrDefault(ch, 0) + 1);
         }
         return m;
     }
 
     private boolean hasTileAt(Board board, int row, int col) {
-        if (row < 0 || row >= Board.SIZE || col < 0 || col >= Board.SIZE) return false;
+        if (row < 0 || row >= Board.SIZE || col < 0 || col >= Board.SIZE)
+            return false;
         return board.getTile(row, col) != '.';
     }
 
-    private static record Anchor(int row, int col) {}
+    private static record Anchor(int row, int col) {
+    }
 }

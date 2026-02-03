@@ -1,6 +1,6 @@
 # Scrabble Solver Roadmap
 
-This roadmap tracks the project from a rack-only solver → full board solver → polished frontend demo linked on my portfolio site.
+This roadmap tracks the project from a rack-only solver → full board solver → polished frontend demo linked on my portfolio site. Didnt think to create one during initial setup, might add total roadmap afterwards if i have the time
 
 ---
 

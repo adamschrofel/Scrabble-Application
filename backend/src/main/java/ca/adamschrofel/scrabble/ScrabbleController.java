@@ -106,7 +106,7 @@ public class ScrabbleController {
             String row = rows[r];
             for (int c = 0; c < row.length(); c++) {
                 char ch = row.charAt(c);
-                b.setTile(r, c, ch); // your Board.setTile already uppercases
+                b.setTile(r, c, ch); 
             }
         }
 

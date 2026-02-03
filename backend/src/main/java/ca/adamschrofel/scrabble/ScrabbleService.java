@@ -50,8 +50,8 @@ public class ScrabbleService {
 
     public List<BestPlay> bestPlays(Board board, String rack, int limit) throws InvalidTilesException {
         MoveGenerator gen = new MoveGenerator();
-        BoardLayout layout = new BoardLayout();
-        // If you already have layout as a field, use that instead.
+        BoardLayout layout = BoardLayout.standardLayout();
+        
 
         String tilesNormalized = InputValidator.normalizeTiles(rack);
 

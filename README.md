@@ -53,17 +53,9 @@ This starts:
 Spring Boot backend on http://localhost:8080
 
 React frontend on http://localhost:5173
-### Why this is important
-- Shows you tested from a clean clone
-- Signals professional repo hygiene
-- Reduces recruiter friction to almost zero
 
----
 
-## 2️⃣ Add a short “Project Status” section (signals maturity)
-Near the bottom, add:
-
-```md
+```
 ## Project Status
 
 This project is released as a **v1** focused on correctness and usability.

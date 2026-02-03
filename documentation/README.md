@@ -74,24 +74,17 @@ Motivation
 
 
 This project was built to:
-
-Improve Java and algorithmic problem-solving skills
-
-Learn Spring Boot and REST API design
-
-Practice building a full-stack application from scratch
-
-Create a portfolio project that combines logic, UX, and real-world constraints
-
-Also… to help me continue to dominate my family at Scrabble.
+    - Improve Java and algorithmic problem-solving skills
+    - Learn Spring Boot and REST API design
+    - Practice building a full-stack application from scratch
+    - Create a portfolio project that combines logic, UX, and real-world constraints
+    - Also… to help me continue to dominate my family at Scrabble.
 
 Future Improvements
+    - Dictionary definitions via Merriam-Webster API
+    - Mobile UI improvements
+    - Performance optimizations, currently quite slow solving board with 2+ words played(Currently slowed down by dictionary iteration for board solving, scans dictionary for every anchor point)
 
-Dictionary definitions via Merriam-Webster API
-
-Mobile UI improvements
-
-Performance optimizations, currently quite slow solving board with 2+ words played
 
 Author
 

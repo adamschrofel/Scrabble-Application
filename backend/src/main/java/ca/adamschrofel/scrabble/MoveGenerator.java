@@ -1,11 +1,9 @@
 package ca.adamschrofel.scrabble;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import ca.adamschrofel.scrabble.dto.BestPlay;
@@ -24,9 +22,18 @@ public class MoveGenerator {
             WordFinder dictionary,
             String rack,
             int limit) {
+        long candidatesStart = 0L;
+        long evaluationStart = 0L;
 
+        candidatesStart = System.nanoTime();
+        
+        // Generates Candidate Placements
         List<Placement> candidates = generateCandidatePlacements(board, dictionary, rack);
 
+        evaluationStart = System.nanoTime();
+        System.out.println(
+                "Timing - generateCandidatePlacements: " + formatDuration(evaluationStart - candidatesStart));
+        // evaluate candidates fully (Board legality, scoring, corsswords)
         List<BestPlay> plays = new ArrayList<>();
         Set<String> seen = new HashSet<>();
 
@@ -48,7 +55,12 @@ public class MoveGenerator {
         }
 
         plays.sort(Comparator.comparingInt(BestPlay::score).reversed());
-        if(limit > 0 && plays.size()> limit){
+
+        long end = System.nanoTime();
+        System.out.println("Timing - evaluateCandidates: " + formatDuration(end - evaluationStart));
+        System.out.println("Timing - totalGenerateBestPlays: " + formatDuration(end - candidatesStart));
+
+        if (limit > 0 && plays.size() > limit) {
             return new ArrayList<>(plays.subList(0, limit));
         }
         return plays;
@@ -66,10 +78,10 @@ public class MoveGenerator {
         List<Anchor> anchors = findAnchors(board);
 
         String rackNorm = (rack == null) ? "" : rack.trim().toUpperCase();
-
+        RackInfo rackInfo = RackInfo.fromRack(rackNorm);
         for (Anchor a : anchors) {
-            generateFromAnchor(board, dictionary, rackNorm, a, Direction.ACROSS, out);
-            generateFromAnchor(board, dictionary, rackNorm, a, Direction.DOWN, out);
+            generateFromAnchor(board, dictionary, rackInfo, a, Direction.ACROSS, out);
+            generateFromAnchor(board, dictionary, rackInfo, a, Direction.DOWN, out);
         }
 
         return out;
@@ -108,7 +120,7 @@ public class MoveGenerator {
     private void generateFromAnchor(
             Board board,
             WordFinder dictionary,
-            String rack,
+            RackInfo rackInfo,
             Anchor anchor,
             Direction dir,
             List<Placement> out) {
@@ -134,8 +146,12 @@ public class MoveGenerator {
                 int minLenToCoverAnchor = Math.max(2, (ac - startCol) + 1);
 
                 for (int len = minLenToCoverAnchor; len <= maxLenByBounds; len++) {
+                    char[] pattern = buildPattern(board, ar, startCol, dir, len);
                     for (String word : dictionary.wordsOfLength(len)) {
-                        if (fitsBoardAndRack(board, rack, ar, startCol, dir, word)) {
+                        if (!matchesPattern(word, pattern)){
+                            continue;
+                        }
+                        if (fitsRackWithPattern(rackInfo, word, pattern)) {
                             out.add(new Placement(word, ar, startCol, dir));
                         }
                     }
@@ -147,8 +163,12 @@ public class MoveGenerator {
                 int minLenToCoverAnchor = Math.max(2, (ar - startRow) + 1);
 
                 for (int len = minLenToCoverAnchor; len <= maxLenByBounds; len++) {
+                    char[] pattern = buildPattern(board, startRow, ac, dir, len);
                     for (String word : dictionary.wordsOfLength(len)) {
-                        if (fitsBoardAndRack(board, rack, startRow, ac, dir, word)) {
+                        if (!matchesPattern(word, pattern)){
+                            continue;
+                        }
+                        if (fitsRackWithPattern(rackInfo, word, pattern)) {
                             out.add(new Placement(word, startRow, ac, dir));
                         }
                     }
@@ -157,47 +177,68 @@ public class MoveGenerator {
         }
     }
 
-    private boolean fitsBoardAndRack(Board board, String rack, int row, int col, Direction dir, String word) {
+   /**
+     * Checks if the rack can supply the letters needed for the '.' slots in the pattern.
+     * Fixed letters are already enforced by matchesPattern, so we only count blanks/letters
+     * for empty board squares.
+     */
+    private boolean fitsRackWithPattern(RackInfo rackInfo, String word, char[] pattern) {
         String w = word.toUpperCase();
-        int len = w.length();
-
-        if (dir == Direction.ACROSS) {
-            if (col < 0 || col + len > Board.SIZE)
-                return false;
-        } else {
-            if (row < 0 || row + len > Board.SIZE)
-                return false;
-        }
-
-        Map<Character, Integer> counts = rackCounts(rack);
-        int blanks = counts.getOrDefault('?', 0) + counts.getOrDefault('*', 0);
+        int len = pattern.length;
+        int[] neededCounts = new int[26];
 
         for (int i = 0; i < len; i++) {
-            int r = (dir == Direction.ACROSS) ? row : row + i;
-            int c = (dir == Direction.ACROSS) ? col + i : col;
-
-            char needed = w.charAt(i);
-            char existing = board.getTile(r, c);
-
-            if (existing != '.') {
-                if (existing != needed)
-                    return false;
-                continue;
+            if (pattern[i] != '.') {
+                continue; // fixed board letter, no rack tile needed
             }
+            char neededChar = w.charAt(i);
+            neededCounts[neededChar - 'A']++;
+        }
 
-            int have = counts.getOrDefault(needed, 0);
-            if (have > 0) {
-                counts.put(needed, have - 1);
-            } else if (blanks > 0) {
-                blanks--;
-            } else {
+        int blanksUsed = 0;
+        for (int i = 0; i < 26; i++) {
+            int shortage = neededCounts[i] - rackInfo.counts[i];
+            if (shortage > 0) {
+                blanksUsed += shortage;
+                if (blanksUsed > rackInfo.blanks) {
+                    return false;
+                }
+            }
+        }
+        return blanksUsed <= rackInfo.blanks;
+    }
+    /**
+     * Builds a fixed-letter pattern ('.' for empty, letter for filled) along a span.
+     */
+    private char[] buildPattern(Board board, int row, int col, Direction dir, int len) {
+        char[] pattern = new char[len];
+        int r = row;
+        int c = col;
+        int dr = dir.directionRow;
+        int dc = dir.directionColumn;
+
+        for (int i = 0; i < len; i++) {
+            char existing = board.getTile(r, c);
+            pattern[i] = existing == '.' ? '.' : existing;
+            r += dr;
+            c += dc;
+        }
+        return pattern;
+    }
+    /**
+     * Checks whether a dictionary word matches all fixed letters in the pattern.
+     */
+    private boolean matchesPattern(String word, char[] pattern) {
+        String w = word.toUpperCase();
+        int len = pattern.length;
+        for (int i = 0; i < len; i++) {
+            char expected = pattern[i];
+            if (expected != '.' && w.charAt(i) != expected) {
                 return false;
             }
         }
-
         return true;
     }
-
     /**
      * Compute which tiles would be newly placed for this placement (without
      * mutating board).
@@ -226,15 +267,33 @@ public class MoveGenerator {
         return tiles;
     }
 
-    private Map<Character, Integer> rackCounts(String rack) {
-        Map<Character, Integer> m = new HashMap<>();
-        for (int i = 0; i < rack.length(); i++) {
-            char ch = Character.toUpperCase(rack.charAt(i));
-            if (ch == ' ')
-                continue;
-            m.put(ch, m.getOrDefault(ch, 0) + 1);
+    private static final class RackInfo {
+        private final int[] counts;
+        private final int blanks;
+
+        private RackInfo(int[] counts, int blanks) {
+            this.counts = counts;
+            this.blanks = blanks;
         }
-        return m;
+
+        private static RackInfo fromRack(String rack) {
+            int[] counts = new int[26];
+            int blanks = 0;
+            for (int i = 0; i < rack.length(); i++) {
+                char ch = Character.toUpperCase(rack.charAt(i));
+                if (ch == ' ') {
+                    continue;
+                }
+                if (ch == '?' || ch == '*') {
+                    blanks++;
+                    continue;
+                }
+                if (ch >= 'A' && ch <= 'Z') {
+                    counts[ch - 'A']++;
+                }
+            }
+            return new RackInfo(counts, blanks);
+        }
     }
 
     private boolean hasTileAt(Board board, int row, int col) {
@@ -244,5 +303,10 @@ public class MoveGenerator {
     }
 
     private static record Anchor(int row, int col) {
+    }
+
+    private String formatDuration(long nanos) {
+        double ms = nanos / 1_000_000.0;
+        return String.format("%.2f ms", ms);
     }
 }

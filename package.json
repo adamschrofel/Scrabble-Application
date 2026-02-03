@@ -1,6 +1,7 @@
 {
   "private": true,
   "scripts": {
+    "setup": "npm install & cd frontend && npm install",
     "dev": "concurrently \"cd backend && ./mvnw spring-boot:run\" \"cd frontend && npm run dev\"",
     "open": "code scrabble.code-workspace",
     "start": "npm run open && npm run dev",

@@ -49,13 +49,12 @@ public class Main {
         ScrabbleService service = new ScrabbleService();
         // Solve the rack and get words grouped by length
         List<WordFinder.LengthGroup> groups = service.solve(tiles);
-        ScrabbleScoring ss = new ScrabbleScoring();
         // Display results organized by word length
         for (WordFinder.LengthGroup g : groups) {
             System.out.println("\n" + g.length + "-letter words:");
             // Print each word in the group (already sorted)
             for (String w : g.words) {
-                int wordScore = ss.scoreWord(w);
+                int wordScore = ScrabbleScoring.scoreWord(w);
                 System.out.println("  " + w + " "+ wordScore);
             }
         }

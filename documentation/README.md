@@ -48,6 +48,7 @@ scrabble-application/
 ---
 
 ## Running the Project Locally
+npm run dev (from project root)
 
 ### Backend
 

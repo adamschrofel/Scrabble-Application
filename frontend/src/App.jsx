@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
+import MainPage from "./MainPage.jsx";
 import WordFinderPage from "./WordFinderPage.jsx";
 import DefinitionPage from "./DefinitionPage.jsx";
 import WordCheckPage from "./WordCheckPage.jsx";
@@ -11,8 +12,9 @@ export default function App() {
   const [error, setError] = useState("");
   return (
     <Routes>
+      <Route path="/" element={<MainPage />} />
       <Route
-        path="/"
+        path="/finder"
         element={
           <WordFinderPage
             tiles={tiles}

@@ -36,27 +36,38 @@ This project started as a Java command-line tool and has evolved into a web appl
 
 
 ## Running the Project Locally
+
+
 npm run dev (from project root)
 
 ### Backend
+```bash
+git clone https://github.com/adamschrofel/Scrabble-Application.git
+cd Scrabble-Application
 
-cd backend
-./mvnw spring-boot:run
-The API will run on http://localhost:8080.
-
-Frontend
-cd frontend
-npm install
+npm run setup
 npm run dev
 
+This starts:
 
-The frontend will be available at http://localhost:5173.
+Spring Boot backend on http://localhost:8080
 
-API Example
-GET /api/solve?tiles=triedest
+React frontend on http://localhost:5173
+### Why this is important
+- Shows you tested from a clean clone
+- Signals professional repo hygiene
+- Reduces recruiter friction to almost zero
 
+---
 
-Returns valid words and scores in JSON format.
+## 2️⃣ Add a short “Project Status” section (signals maturity)
+Near the bottom, add:
+
+```md
+## Project Status
+
+This project is released as a **v1** focused on correctness and usability.
+Performance optimizations and feature improvements are tracked in GitHub Issues.
 
 Motivation
 

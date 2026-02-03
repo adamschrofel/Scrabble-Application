@@ -33,19 +33,7 @@ This project started as a Java command-line tool and has evolved into a web appl
 
 ---
 
-## Project Structure
 
-scrabble-application/
-├── backend/ # Spring Boot API
-│ ├── src/
-│ └── pom.xml
-├── frontend/ # React + Vite app
-│ ├── src/
-│ └── package.json
-└── README.md
-
-
----
 
 ## Running the Project Locally
 npm run dev (from project root)

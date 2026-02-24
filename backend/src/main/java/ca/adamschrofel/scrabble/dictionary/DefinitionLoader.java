@@ -1,4 +1,4 @@
-package ca.adamschrofel.scrabble;
+package ca.adamschrofel.scrabble.dictionary;
 
 import java.io.InputStream;
 import java.util.HashMap;

@@ -4,6 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
+import ca.adamschrofel.scrabble.board.BoardLayout;
+import ca.adamschrofel.scrabble.board.TileType;
+
 public class BoardLayoutTest {
     
     @Test

@@ -1,4 +1,4 @@
-package ca.adamschrofel.scrabble.api;
+package ca.adamschrofel.scrabble.controller;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,9 +9,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import ca.adamschrofel.scrabble.Board;
 import ca.adamschrofel.scrabble.InputValidator;
-import ca.adamschrofel.scrabble.ScrabbleScoring;
+import ca.adamschrofel.scrabble.board.Board;
 import ca.adamschrofel.scrabble.dto.BestPlay;
 import ca.adamschrofel.scrabble.dto.BoardResponse;
 import ca.adamschrofel.scrabble.dto.DefinitionResponse;
@@ -22,7 +21,8 @@ import ca.adamschrofel.scrabble.dto.SetTilesRequest;
 import ca.adamschrofel.scrabble.dto.SolveResponse;
 import ca.adamschrofel.scrabble.dto.WordGroup;
 import ca.adamschrofel.scrabble.exceptions.InvalidTilesException;
-import ca.adamschrofel.scrabble.service.*;
+import ca.adamschrofel.scrabble.scoring.ScrabbleScoring;
+import ca.adamschrofel.scrabble.services.*;
 
 
 

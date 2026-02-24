@@ -1,6 +1,9 @@
 package ca.adamschrofel.scrabble;
 
 import org.junit.jupiter.api.Test;
+
+import ca.adamschrofel.scrabble.board.Board;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class BoardTest {

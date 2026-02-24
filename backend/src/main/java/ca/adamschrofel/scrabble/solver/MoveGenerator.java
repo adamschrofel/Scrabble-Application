@@ -6,9 +6,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
-import ca.adamschrofel.scrabble.Board;
-import ca.adamschrofel.scrabble.BoardLayout;
-import ca.adamschrofel.scrabble.Direction;
+import ca.adamschrofel.scrabble.board.Board;
+import ca.adamschrofel.scrabble.board.BoardLayout;
+import ca.adamschrofel.scrabble.board.Direction;
 import ca.adamschrofel.scrabble.dictionary.Dictionary;
 import ca.adamschrofel.scrabble.dto.BestPlay;
 import ca.adamschrofel.scrabble.dto.MoveEvaluation;

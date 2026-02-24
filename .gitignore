@@ -6,7 +6,7 @@ __MACOSX/
 .vscode/
 
 # ---- Logs ----
-*.log
+**/logs
 
 # ---- Java / Maven / Spring ----
 **/target/

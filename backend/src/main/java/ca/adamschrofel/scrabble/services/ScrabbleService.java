@@ -1,10 +1,10 @@
-package ca.adamschrofel.scrabble.service;
+package ca.adamschrofel.scrabble.services;
 
 import org.springframework.stereotype.Service;
 
-import ca.adamschrofel.scrabble.Board;
-import ca.adamschrofel.scrabble.BoardLayout;
 import ca.adamschrofel.scrabble.InputValidator;
+import ca.adamschrofel.scrabble.board.Board;
+import ca.adamschrofel.scrabble.board.BoardLayout;
 import ca.adamschrofel.scrabble.dictionary.Dictionary;
 import ca.adamschrofel.scrabble.dictionary.WordListDictionary;
 import ca.adamschrofel.scrabble.dto.BestPlay;

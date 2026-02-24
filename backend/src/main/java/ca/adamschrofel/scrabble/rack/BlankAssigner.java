@@ -6,12 +6,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import ca.adamschrofel.scrabble.Board;
-import ca.adamschrofel.scrabble.BoardLayout;
-import ca.adamschrofel.scrabble.ScrabbleScoring;
-import ca.adamschrofel.scrabble.TileType;
+import ca.adamschrofel.scrabble.board.Board;
+import ca.adamschrofel.scrabble.board.BoardLayout;
+import ca.adamschrofel.scrabble.board.TileType;
 import ca.adamschrofel.scrabble.dto.PlacedTile;
 import ca.adamschrofel.scrabble.dto.Placement;
+import ca.adamschrofel.scrabble.scoring.ScrabbleScoring;
 
 /**
  * Computes which newly placed tiles are blanks for a given placement and rack.

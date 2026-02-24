@@ -2,13 +2,17 @@ package ca.adamschrofel.scrabble;
 
 import org.junit.jupiter.api.Test;
 
-import ca.adamschrofel.scrabble.dictionary.Dictionary;
-import ca.adamschrofel.scrabble.dto.MoveEvaluation;
-import ca.adamschrofel.scrabble.dto.Placement;
-import ca.adamschrofel.scrabble.rack.RackWordFinder;
-import ca.adamschrofel.scrabble.solver.MoveEvaluator;
+import ca.adamschrofel.scrabble.board.Board;
+import ca.adamschrofel.scrabble.board.BoardLayout;
+import ca.adamschrofel.scrabble.board.TileType;
 
-import static org.junit.jupiter.api.Assertions.*;
+//import ca.adamschrofel.scrabble.dictionary.Dictionary;
+//import ca.adamschrofel.scrabble.dto.MoveEvaluation;
+//import ca.adamschrofel.scrabble.dto.Placement;
+//import ca.adamschrofel.scrabble.rack.RackWordFinder;
+//import ca.adamschrofel.scrabble.solver.MoveEvaluator;
+
+//import static org.junit.jupiter.api.Assertions.*;
 
 public class MoveEvaluatorTest {
 
@@ -29,7 +33,7 @@ public class MoveEvaluatorTest {
        // Dictionary dict = new RackWordFinder("dictionary/csw19Words.txt");
 
         // Place "IT" across so T lands at (7,8) making "ATE" down
-        Placement p = new Placement("IT", 7, 7, Direction.ACROSS);
+        //Placement p = new Placement("IT", 7, 7, Direction.ACROSS);
 
         //MoveEvaluation eval = MoveEvaluator.evaluate(board, layout, p, dict, null);
 

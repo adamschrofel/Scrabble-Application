@@ -1,5 +1,8 @@
-package ca.adamschrofel.scrabble;
+package ca.adamschrofel.scrabble.scoring;
 
+import ca.adamschrofel.scrabble.board.Board;
+import ca.adamschrofel.scrabble.board.BoardLayout;
+import ca.adamschrofel.scrabble.board.TileType;
 import ca.adamschrofel.scrabble.dto.WordSpan;
 
 /**

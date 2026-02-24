@@ -1,4 +1,4 @@
-package ca.adamschrofel.scrabble;
+package ca.adamschrofel.scrabble.board;
 
 public enum TileType {
     NORMAL(1,1),

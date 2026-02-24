@@ -1,4 +1,4 @@
-package ca.adamschrofel.scrabble;
+package ca.adamschrofel.scrabble.board;
 
 public class BoardLayout {
     private final TileType[][] tileType = new TileType[Board.SIZE][Board.SIZE];

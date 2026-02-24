@@ -1,9 +1,9 @@
-package ca.adamschrofel.scrabble.service;
+package ca.adamschrofel.scrabble.services;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
-import ca.adamschrofel.scrabble.DefinitionLoader;
+import ca.adamschrofel.scrabble.dictionary.DefinitionLoader;
 
 /**
  * Service layer that provides word definitions from the CSW (Collins Scrabble Words) dictionary.

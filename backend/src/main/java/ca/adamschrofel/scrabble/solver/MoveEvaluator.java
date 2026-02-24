@@ -5,10 +5,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import ca.adamschrofel.scrabble.Board;
-import ca.adamschrofel.scrabble.BoardLayout;
-import ca.adamschrofel.scrabble.Direction;
-import ca.adamschrofel.scrabble.WordScorer;
+import ca.adamschrofel.scrabble.board.Board;
+import ca.adamschrofel.scrabble.board.BoardLayout;
+import ca.adamschrofel.scrabble.board.Direction;
 import ca.adamschrofel.scrabble.dictionary.Dictionary;
 import ca.adamschrofel.scrabble.dto.MoveEvaluation;
 import ca.adamschrofel.scrabble.dto.PlacedTile;
@@ -16,6 +15,7 @@ import ca.adamschrofel.scrabble.dto.Placement;
 import ca.adamschrofel.scrabble.dto.WordSpan;
 import ca.adamschrofel.scrabble.rack.BlankAssigner;
 import ca.adamschrofel.scrabble.rack.Rack;
+import ca.adamschrofel.scrabble.scoring.WordScorer;
 
 public class MoveEvaluator {
     public static MoveEvaluation evaluate(Board board, BoardLayout layout, Placement placement, Dictionary dictionary, Rack rack) {

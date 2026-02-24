@@ -1,4 +1,4 @@
-package ca.adamschrofel.scrabble;
+package ca.adamschrofel.scrabble.scoring;
 
 /**
  * Provides Scrabble tile point values.

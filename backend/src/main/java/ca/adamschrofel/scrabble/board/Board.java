@@ -1,4 +1,4 @@
-package ca.adamschrofel.scrabble;
+package ca.adamschrofel.scrabble.board;
 
 import java.util.ArrayList;
 import java.util.List;

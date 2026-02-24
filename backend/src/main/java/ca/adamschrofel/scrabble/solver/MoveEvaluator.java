@@ -5,20 +5,20 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import ca.adamschrofel.scrabble.BlankAssigner;
 import ca.adamschrofel.scrabble.Board;
 import ca.adamschrofel.scrabble.BoardLayout;
 import ca.adamschrofel.scrabble.Direction;
-import ca.adamschrofel.scrabble.Rack;
-import ca.adamschrofel.scrabble.WordFinder;
 import ca.adamschrofel.scrabble.WordScorer;
+import ca.adamschrofel.scrabble.dictionary.Dictionary;
 import ca.adamschrofel.scrabble.dto.MoveEvaluation;
 import ca.adamschrofel.scrabble.dto.PlacedTile;
 import ca.adamschrofel.scrabble.dto.Placement;
 import ca.adamschrofel.scrabble.dto.WordSpan;
+import ca.adamschrofel.scrabble.rack.BlankAssigner;
+import ca.adamschrofel.scrabble.rack.Rack;
 
 public class MoveEvaluator {
-    public static MoveEvaluation evaluate(Board board, BoardLayout layout, Placement placement, WordFinder dictionary, Rack rack) {
+    public static MoveEvaluation evaluate(Board board, BoardLayout layout, Placement placement, Dictionary dictionary, Rack rack) {
         if (!board.isLegalPlacement(placement)) {
             return new MoveEvaluation(false, 0, List.of(), List.of());
         }
@@ -36,7 +36,7 @@ public class MoveEvaluator {
             PlacedTile anchor = newlyPlaced.get(0);
             WordSpan main = buildWordSpan(board, anchor.row(), anchor.column(), placement.direction());
 
-            if (main.word().length() < 2 || !dictionary.isWord(main.word())){
+            if (main.word().length() < 2 || !dictionary.contains(main.word())){
                 return new MoveEvaluation(false, 0, List.of(), List.of());
             }
 
@@ -65,7 +65,7 @@ public class MoveEvaluator {
                 WordSpan cross = buildWordSpan(board, t.row(), t.column(), crossDirection);
 
                 if (cross.word().length() >= 2) {
-                    if (!dictionary.isWord(cross.word())) {
+                    if (!dictionary.contains(cross.word())) {
                         return new MoveEvaluation(false, 0, List.of(), List.of());
                     }
 

@@ -9,11 +9,11 @@ import java.util.Set;
 import ca.adamschrofel.scrabble.Board;
 import ca.adamschrofel.scrabble.BoardLayout;
 import ca.adamschrofel.scrabble.Direction;
-import ca.adamschrofel.scrabble.Rack;
-import ca.adamschrofel.scrabble.WordFinder;
+import ca.adamschrofel.scrabble.dictionary.Dictionary;
 import ca.adamschrofel.scrabble.dto.BestPlay;
 import ca.adamschrofel.scrabble.dto.MoveEvaluation;
 import ca.adamschrofel.scrabble.dto.Placement;
+import ca.adamschrofel.scrabble.rack.Rack;
 
 public class MoveGenerator {
 
@@ -23,7 +23,7 @@ public class MoveGenerator {
     public List<BestPlay> generateBestPlays(
             Board board,
             BoardLayout layout,
-            WordFinder dictionary,
+            Dictionary dictionary,
             String rack,
             int limit) {
         long candidatesStart = 0L;
@@ -78,7 +78,7 @@ public class MoveGenerator {
      */
     public List<Placement> generateCandidatePlacements(
             Board board,
-            WordFinder dictionary,
+            Dictionary dictionary,
             String rack) {
         List<Placement> out = new ArrayList<>();
         List<Anchor> anchors = findAnchors(board);
@@ -125,7 +125,7 @@ public class MoveGenerator {
 
     private void generateFromAnchor(
             Board board,
-            WordFinder dictionary,
+            Dictionary dictionary,
             Rack rackInfo,
             Anchor anchor,
             Direction dir,

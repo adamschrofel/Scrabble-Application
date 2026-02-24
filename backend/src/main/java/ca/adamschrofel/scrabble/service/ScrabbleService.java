@@ -5,9 +5,12 @@ import org.springframework.stereotype.Service;
 import ca.adamschrofel.scrabble.Board;
 import ca.adamschrofel.scrabble.BoardLayout;
 import ca.adamschrofel.scrabble.InputValidator;
-import ca.adamschrofel.scrabble.WordFinder;
-import ca.adamschrofel.scrabble.Exceptions.InvalidTilesException;
+import ca.adamschrofel.scrabble.dictionary.Dictionary;
+import ca.adamschrofel.scrabble.dictionary.WordListDictionary;
 import ca.adamschrofel.scrabble.dto.BestPlay;
+import ca.adamschrofel.scrabble.dto.LengthGroup;
+import ca.adamschrofel.scrabble.exceptions.InvalidTilesException;
+import ca.adamschrofel.scrabble.rack.RackWordFinder;
 import ca.adamschrofel.scrabble.solver.MoveGenerator;
 
 import java.util.List;
@@ -21,9 +24,10 @@ import java.util.List;
 public class ScrabbleService {
     // Path to the CSW (Collins Scrabble Words) dictionary file loaded at startup
     private static final String DICT_PATH = "dictionary/csw19Words.txt";
+    private final Dictionary dictionary;
 
-    // WordFinder handles the core algorithm for finding playable words
-    private final WordFinder wf;
+    // handles rack-only word searching
+    private final RackWordFinder rackWordFinder;
     
 
     /**
@@ -31,7 +35,8 @@ public class ScrabbleService {
      * Loads the dictionary file into memory via WordFinder constructor.
      */
     public ScrabbleService() {
-        this.wf = new WordFinder(DICT_PATH);
+        this.dictionary = new WordListDictionary(DICT_PATH);
+        this.rackWordFinder = new RackWordFinder();
     }
 
     /**
@@ -44,11 +49,11 @@ public class ScrabbleService {
      *         length,
      *         ordered from longest to shortest for better user experience
      */
-    public List<WordFinder.LengthGroup> solve(String rack) {
+    public List<LengthGroup> solve(String rack) {
         // Find all playable words that can be formed from the given tiles
-        List<String> playable = wf.findPlayableWords(rack);
+        List<String> playable = rackWordFinder.findPlayableWords(rack, dictionary);
         // Group the results by word length (e.g., all 5-letter words together)
-        return wf.groupPlayableWords(playable);
+        return rackWordFinder.groupPlayableWords(playable);
     }
 
     public List<BestPlay> bestPlays(Board board, String rack, int limit) throws InvalidTilesException {
@@ -57,7 +62,7 @@ public class ScrabbleService {
         
         String tilesNormalized = InputValidator.normalizeTiles(rack);
 
-        return gen.generateBestPlays(board, layout, this.wf, tilesNormalized, limit);
+        return gen.generateBestPlays(board, layout, this.dictionary, tilesNormalized, limit);
     }
 
 }

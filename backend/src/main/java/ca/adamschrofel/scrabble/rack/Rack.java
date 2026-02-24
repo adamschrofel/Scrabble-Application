@@ -1,4 +1,4 @@
-package ca.adamschrofel.scrabble;
+package ca.adamschrofel.scrabble.rack;
 
 /**
  * Rack is players possible scrabble tiles

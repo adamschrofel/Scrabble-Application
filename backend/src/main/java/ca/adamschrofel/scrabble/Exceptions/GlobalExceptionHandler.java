@@ -1,4 +1,4 @@
-package ca.adamschrofel.scrabble.Exceptions;
+package ca.adamschrofel.scrabble.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

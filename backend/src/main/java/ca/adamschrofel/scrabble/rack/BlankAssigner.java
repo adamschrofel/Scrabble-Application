@@ -1,4 +1,4 @@
-package ca.adamschrofel.scrabble;
+package ca.adamschrofel.scrabble.rack;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -6,6 +6,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import ca.adamschrofel.scrabble.Board;
+import ca.adamschrofel.scrabble.BoardLayout;
+import ca.adamschrofel.scrabble.ScrabbleScoring;
+import ca.adamschrofel.scrabble.TileType;
 import ca.adamschrofel.scrabble.dto.PlacedTile;
 import ca.adamschrofel.scrabble.dto.Placement;
 

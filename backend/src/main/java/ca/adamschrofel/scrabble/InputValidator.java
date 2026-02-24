@@ -3,7 +3,7 @@ package ca.adamschrofel.scrabble;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import ca.adamschrofel.scrabble.Exceptions.InvalidTilesException;
+import ca.adamschrofel.scrabble.exceptions.InvalidTilesException;
 
 /**
  * Utility class validates and normalizes user input

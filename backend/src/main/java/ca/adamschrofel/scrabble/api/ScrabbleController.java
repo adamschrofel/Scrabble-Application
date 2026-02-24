@@ -12,19 +12,19 @@ import org.springframework.web.bind.annotation.RestController;
 import ca.adamschrofel.scrabble.Board;
 import ca.adamschrofel.scrabble.InputValidator;
 import ca.adamschrofel.scrabble.ScrabbleScoring;
-import ca.adamschrofel.scrabble.WordFinder;
-import ca.adamschrofel.scrabble.Exceptions.InvalidTilesException;
 import ca.adamschrofel.scrabble.dto.BestPlay;
 import ca.adamschrofel.scrabble.dto.BoardResponse;
 import ca.adamschrofel.scrabble.dto.DefinitionResponse;
+import ca.adamschrofel.scrabble.dto.LengthGroup;
 import ca.adamschrofel.scrabble.dto.ScoreWord;
 import ca.adamschrofel.scrabble.dto.SetTileRequest;
 import ca.adamschrofel.scrabble.dto.SetTilesRequest;
 import ca.adamschrofel.scrabble.dto.SolveResponse;
 import ca.adamschrofel.scrabble.dto.WordGroup;
-import ca.adamschrofel.scrabble.service.BoardService;
-import ca.adamschrofel.scrabble.service.DefinitionService;
-import ca.adamschrofel.scrabble.service.ScrabbleService;
+import ca.adamschrofel.scrabble.exceptions.InvalidTilesException;
+import ca.adamschrofel.scrabble.service.*;
+
+
 
 
 /**
@@ -75,12 +75,12 @@ public class ScrabbleController {
 
         List<WordGroup> groups = new ArrayList<>();
 
-        for (WordFinder.LengthGroup g : service.solve(tilesNormalized)) {
+        for (LengthGroup g : service.solve(tilesNormalized)) {
             List<ScoreWord> scored = new ArrayList<>();
-            for (String w : g.words) {
+            for (String w : g.words()) {
                 scored.add(new ScoreWord(w, ScrabbleScoring.scoreWord(w)));
             }
-            groups.add(new WordGroup(g.length, scored));
+            groups.add(new WordGroup(g.length(), scored));
         }
         return new SolveResponse(tilesNormalized, groups);
 

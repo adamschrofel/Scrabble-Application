@@ -121,4 +121,22 @@ public class Rack {
     public int getTotalTiles() {
         return totalTiles;
     }
+
+    /**
+     * Returns true if this rack (letters + blanks) can cover the requested letter counts.
+     * neededCounts is expected to be length 26.
+     */
+    public boolean canCover(int[] neededCounts) {
+        int blanksUsed = 0;
+        for (int i = 0; i < 26; i++) {
+            int shortage = neededCounts[i] - counts[i];
+            if (shortage > 0) {
+                blanksUsed += shortage;
+                if (blanksUsed > blanks) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 }

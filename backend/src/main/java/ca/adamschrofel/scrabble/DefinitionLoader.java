@@ -23,7 +23,7 @@ public final class DefinitionLoader {
      * 1. Loads the file from classpath resources
      * 2. Reads each line and splits on tab character
      * 3. Converts words to uppercase for case-insensitive lookups
-     * 4. Skips empty lines and malformed entries
+     * 4. Skips empty lines and bad entries
      * 5. Returns a HashMap for word lookup
      *
      * @param path The path to the definition file: dictionary/csw19Definitions.txt

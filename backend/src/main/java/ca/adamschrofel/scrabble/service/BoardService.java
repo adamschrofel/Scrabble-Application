@@ -1,6 +1,8 @@
-package ca.adamschrofel.scrabble;
+package ca.adamschrofel.scrabble.service;
 
 import org.springframework.stereotype.Service;
+
+import ca.adamschrofel.scrabble.Board;
 // TODO(#2) add comments
 @Service
 public class BoardService {

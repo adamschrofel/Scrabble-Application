@@ -88,7 +88,7 @@ public class Board {
             
             if (existingTile == '.') {
                 grid[x][y] = placedTile;
-                newlyPlaced.add(new PlacedTile(x, y, placedTile));
+                newlyPlaced.add(new PlacedTile(x, y, placedTile, false));
             }
         }
         return newlyPlaced;
@@ -169,10 +169,25 @@ public class Board {
         }
     }
 
-    public void unplace(List<PlacedTile> newlyPlacedTiles){
+    /**
+     * Undo a prior applyTiles call
+     */
+    public void unapplyTiles(List<PlacedTile> newlyPlacedTiles){
         for (PlacedTile t : newlyPlacedTiles){
             grid[t.row()][t.column()] = '.';
         }
     }
+
+    /**
+     * Apply a list of tiles onto the board (used by solver evaluation)
+     * Tiles are assumed to only target empty squares
+     */
+    public void applyTiles(List<PlacedTile> tiles){
+        for (PlacedTile t : tiles){
+            setTile(t.row(), t.column(), t.tile());
+        }
+    }
+
+    
 
 }

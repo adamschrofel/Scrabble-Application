@@ -1,37 +1,58 @@
-package ca.adamschrofel.scrabble;
+package ca.adamschrofel.scrabble.solver;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import ca.adamschrofel.scrabble.BlankAssigner;
+import ca.adamschrofel.scrabble.Board;
+import ca.adamschrofel.scrabble.BoardLayout;
+import ca.adamschrofel.scrabble.Direction;
+import ca.adamschrofel.scrabble.Rack;
+import ca.adamschrofel.scrabble.WordFinder;
+import ca.adamschrofel.scrabble.WordScorer;
 import ca.adamschrofel.scrabble.dto.MoveEvaluation;
 import ca.adamschrofel.scrabble.dto.PlacedTile;
 import ca.adamschrofel.scrabble.dto.Placement;
 import ca.adamschrofel.scrabble.dto.WordSpan;
 
 public class MoveEvaluator {
-    public static MoveEvaluation evaluate(Board board, BoardLayout layout, Placement placement, WordFinder dictionary) {
+    public static MoveEvaluation evaluate(Board board, BoardLayout layout, Placement placement, WordFinder dictionary, Rack rack) {
         if (!board.isLegalPlacement(placement)) {
-            return new MoveEvaluation(false, 0, List.of());
+            return new MoveEvaluation(false, 0, List.of(), List.of());
         }
-        // temporarily place tiles so we can score and validate cross words
-        List<PlacedTile> newlyPlaced = board.place(placement);
+
+        // Compute newly placed tiles, including which are blanks.
+        // We apply these tiles temporarily for scoring and cross-word validation.
+        List<PlacedTile> newlyPlaced = BlankAssigner.computePlacedTiles(board, layout, placement, rack);
+        if (newlyPlaced.isEmpty()) {
+            return new MoveEvaluation(false, 0, List.of(), List.of());
+        }
+
+        board.applyTiles(newlyPlaced);
 
         try {
-            if (newlyPlaced.isEmpty()) {
-                return new MoveEvaluation(false, 0, List.of());
-            }
-
             PlacedTile anchor = newlyPlaced.get(0);
             WordSpan main = buildWordSpan(board, anchor.row(), anchor.column(), placement.direction());
 
             if (main.word().length() < 2 || !dictionary.isWord(main.word())){
-                return new MoveEvaluation(false, 0, List.of());
+                return new MoveEvaluation(false, 0, List.of(), List.of());
+            }
+
+            // Build fast lookup tables for scoring
+            boolean[] isNewSquare = new boolean[Board.SIZE * Board.SIZE];
+            boolean[] isBlankOnSquare = new boolean[Board.SIZE * Board.SIZE];
+            for (PlacedTile t : newlyPlaced) {
+                int idx = t.row() * Board.SIZE + t.column();
+                isNewSquare[idx] = true;
+                if (t.isBlank()) {
+                    isBlankOnSquare[idx] = true;
+                }
             }
 
             // score the main word and add any valid cross words
-            int totalScore = PlacementScorer.scoreMainWord(board, layout, main, newlyPlaced);
+            int totalScore = WordScorer.scoreWord(board, layout, main, isNewSquare, isBlankOnSquare);
 
             List<String> wordsFormed = new ArrayList<>();
             wordsFormed.add(main.word());
@@ -45,23 +66,26 @@ public class MoveEvaluator {
 
                 if (cross.word().length() >= 2) {
                     if (!dictionary.isWord(cross.word())) {
-                        return new MoveEvaluation(false, 0, List.of());
+                        return new MoveEvaluation(false, 0, List.of(), List.of());
                     }
 
                     String key = cross.word() + "@" + cross.startRow() + "," + cross.startColumn() + ":" + cross.direction();
                     
                     if(seen.add(key)){
                         wordsFormed.add(cross.word());
-                        // only newly placed tiles get multipliers for crosswords
-                        totalScore += scoreCrossWord(board, layout, cross, t.row(), t.column());
+                        totalScore += WordScorer.scoreWord(board, layout, cross, isNewSquare, isBlankOnSquare);
                     }
                     
                 }
             }
-            return new MoveEvaluation(true, totalScore, wordsFormed);
+            // Bingo bonus (exactly 7 tiles placed)
+            if (newlyPlaced.size() == 7) {
+                totalScore += 50;
+            }
+            return new MoveEvaluation(true, totalScore, wordsFormed, newlyPlaced);
 
         } finally {
-            board.unplace(newlyPlaced);
+            board.unapplyTiles(newlyPlaced);
         }
     }
 
@@ -88,34 +112,6 @@ public class MoveEvaluator {
             c2 += dc;
         }
         return new WordSpan(sb.toString(), r, c, direction);
-    }
-
-    private static int scoreCrossWord(Board board, BoardLayout layout, WordSpan crossWord, int newRow, int newColumn){
-            int dr = crossWord.direction().directionRow;
-            int dc = crossWord.direction().directionColumn;
-       
-
-        int r = crossWord.startRow();
-        int c = crossWord.startColumn();
-
-        int wordMultiplier = 1;
-        int total = 0;
-
-        for (int i = 0; i < crossWord.word().length(); i++) {
-            char letter = board.getTile(r, c);
-            int letterScore = ScrabbleScoring.scoreLetter(letter);
-
-            if (newRow == r && c == newColumn) {
-                TileType tt = layout.getTileType(r, c);
-                letterScore *= tt.letterMultiplier;
-                wordMultiplier *= tt.wordMultiplier;
-            }
-
-            total += letterScore;
-            r += dr;
-            c += dc;
-        }
-        return total * wordMultiplier;
     }
 
     private static Direction perpendicular(Direction direction){

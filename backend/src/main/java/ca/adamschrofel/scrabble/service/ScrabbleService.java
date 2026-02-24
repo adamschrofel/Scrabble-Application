@@ -1,9 +1,14 @@
-package ca.adamschrofel.scrabble;
+package ca.adamschrofel.scrabble.service;
 
 import org.springframework.stereotype.Service;
 
+import ca.adamschrofel.scrabble.Board;
+import ca.adamschrofel.scrabble.BoardLayout;
+import ca.adamschrofel.scrabble.InputValidator;
+import ca.adamschrofel.scrabble.WordFinder;
 import ca.adamschrofel.scrabble.Exceptions.InvalidTilesException;
 import ca.adamschrofel.scrabble.dto.BestPlay;
+import ca.adamschrofel.scrabble.solver.MoveGenerator;
 
 import java.util.List;
 

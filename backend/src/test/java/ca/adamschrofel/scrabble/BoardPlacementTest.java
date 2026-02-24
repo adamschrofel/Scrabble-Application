@@ -31,7 +31,7 @@ public class BoardPlacementTest {
         List<PlacedTile> placed2 = b.place(new Placement("HIT", 7, 7, Direction.ACROSS));
 
         assertEquals(1, placed2.size());
-        assertEquals(new PlacedTile(7, 9, 'T'), placed2.get(0));
+        assertEquals(new PlacedTile(7, 9, 'T', false), placed2.get(0));
         assertEquals('T', b.getTile(7, 9));
     }
 

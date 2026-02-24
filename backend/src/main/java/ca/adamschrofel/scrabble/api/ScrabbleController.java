@@ -1,4 +1,7 @@
-package ca.adamschrofel.scrabble;
+package ca.adamschrofel.scrabble.api;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -6,6 +9,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import ca.adamschrofel.scrabble.Board;
+import ca.adamschrofel.scrabble.InputValidator;
+import ca.adamschrofel.scrabble.ScrabbleScoring;
+import ca.adamschrofel.scrabble.WordFinder;
 import ca.adamschrofel.scrabble.Exceptions.InvalidTilesException;
 import ca.adamschrofel.scrabble.dto.BestPlay;
 import ca.adamschrofel.scrabble.dto.BoardResponse;
@@ -15,8 +22,10 @@ import ca.adamschrofel.scrabble.dto.SetTileRequest;
 import ca.adamschrofel.scrabble.dto.SetTilesRequest;
 import ca.adamschrofel.scrabble.dto.SolveResponse;
 import ca.adamschrofel.scrabble.dto.WordGroup;
+import ca.adamschrofel.scrabble.service.BoardService;
+import ca.adamschrofel.scrabble.service.DefinitionService;
+import ca.adamschrofel.scrabble.service.ScrabbleService;
 
-import java.util.*;
 
 /**
  * REST controller that handles HTTP requests for word solving and word
@@ -57,6 +66,7 @@ public class ScrabbleController {
      * @throws InvalidTilesException If the input contains invalid characters or
      *                               exceeds 15 tiles
      */
+    // TODO change name for this, solvefordefinition?
     @GetMapping("/api/solve")
     public SolveResponse solve(@RequestParam String tiles) throws InvalidTilesException {
         // Validate and normalize the tile input (uppercase, no spaces, check for valid

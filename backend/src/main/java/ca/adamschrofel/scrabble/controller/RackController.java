@@ -18,7 +18,7 @@ import ca.adamschrofel.scrabble.scoring.ScrabbleScoring;
 import ca.adamschrofel.scrabble.service.ScrabbleService;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/rack")
 public class RackController {
     private final ScrabbleService service;
 
@@ -31,18 +31,17 @@ public class RackController {
      * Accepts tile input including blank tiles (? or *) and returns results grouped
      * by word length. Rack only solver.
      * <p>
-     * Primary route: {@code GET /api/rack/solve?tiles=...}
-     * (Alias: {@code GET /api/solve?tiles=...})
+     * Route: {@code GET /api/rack/solve?tiles=...}
      * </p>
      * 
-     * @param tiles A string of tile characters (A-Z, ?, or *) representing the
+     * @param rack A string of tile characters (A-Z, ?, or *) representing the
      *              player's rack
      * @return A map containing the normalized tiles and groups of words organized
      *         by length
      * @throws InvalidTilesException If the input contains invalid characters or
      *                               exceeds 15 tiles
      */
-    @GetMapping("/rack/solve")
+    @GetMapping("/solve")
     public SolveResponse solveRack(@RequestParam String rack) throws InvalidTilesException {
         // Validate and normalize the tile input (uppercase, no spaces, check for valid
         // chars)
@@ -59,12 +58,6 @@ public class RackController {
         }
         return new SolveResponse(normalized, groups);
 
-    }
-
-    // Legacy alias
-    @GetMapping("/solve")
-    public SolveResponse solveLegacy(@RequestParam String tiles) throws InvalidTilesException {
-        return solveRack(tiles);
     }
 
 }

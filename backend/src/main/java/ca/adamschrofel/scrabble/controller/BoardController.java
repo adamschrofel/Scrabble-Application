@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import ca.adamschrofel.scrabble.board.Board;
@@ -20,23 +19,22 @@ import ca.adamschrofel.scrabble.service.BoardService;
 import ca.adamschrofel.scrabble.service.ScrabbleService;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/board")
 public class BoardController {
 
     private final ScrabbleService service;
     private final BoardService board;
 
-    public BoardController(ScrabbleService service, BoardService board){
+    public BoardController(ScrabbleService service, BoardService board) {
         this.service = service;
         this.board = board;
     }
 
-     /**
+    /**
      * Board solver (best plays) using the current server-side board state.
      *
      * <p>
-     * Primary route: {@code POST /api/board/solve} with JSON body.
-     * (Alias: {@code GET /api/bestplays?tiles=...&limit=...})
+     * Route: {@code POST /api/board/solve}
      * </p>
      */
     @PostMapping("/solve")
@@ -46,17 +44,6 @@ public class BoardController {
 
         Board current = board.snapshotBoard();
         return service.bestPlays(current, rack, limit);
-    }
-
-    // Legacy alias
-    @GetMapping("/bestplays")
-    public List<BestPlay> bestPlaysAlias(
-            @RequestParam String tiles,
-            @RequestParam(defaultValue = "25") int limit)
-            throws InvalidTilesException {
-
-        Board current = board.snapshotBoard();
-        return service.bestPlays(current, tiles, limit);
     }
 
     @GetMapping
@@ -70,7 +57,6 @@ public class BoardController {
         return getBoard();
     }
 
-    
     @SuppressWarnings("null")
     @PostMapping("/tile")
     public BoardState setTile(@RequestBody BoardTileUpdate req) {

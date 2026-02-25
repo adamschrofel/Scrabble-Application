@@ -22,7 +22,6 @@ public class Board {
         }
     }
 
-    
     public char getTile(int row, int column) {
         checkBoundary(row, column);
         return grid[row][column];
@@ -39,7 +38,6 @@ public class Board {
             throw new IllegalArgumentException("Out of bounds " + row + ", " + column);
         }
     }
-
 
     // Placement stuff
     public boolean canPlace(Placement p) {
@@ -85,7 +83,7 @@ public class Board {
 
             char placedTile = Character.toUpperCase(word.charAt(i));
             char existingTile = grid[x][y];
-            
+
             if (existingTile == '.') {
                 grid[x][y] = placedTile;
                 newlyPlaced.add(new PlacedTile(x, y, placedTile, false));
@@ -94,6 +92,7 @@ public class Board {
         return newlyPlaced;
 
     }
+
     // TODO: track occupied tile count so it doesnt scan for emptiness
     // checks if tile is empty
     public boolean isEmpty() {
@@ -149,22 +148,21 @@ public class Board {
         return false;
     }
 
-
-    private boolean hasTileAt(int row , int column){
-        if ( row< 0 || row >= SIZE || column < 0 || column >= SIZE){
-            return false; 
+    private boolean hasTileAt(int row, int column) {
+        if (row < 0 || row >= SIZE || column < 0 || column >= SIZE) {
+            return false;
         }
         return grid[row][column] != '.';
     }
 
-    public boolean isLegalPlacement(Placement p){
-        if (!canPlace(p)   ){
+    public boolean isLegalPlacement(Placement p) {
+        if (!canPlace(p)) {
             return false;
         }
 
-        if (isEmpty()){
+        if (isEmpty()) {
             return coversCenter(p);
-        } else { 
+        } else {
             return touchesExistingTile(p);
         }
     }
@@ -172,8 +170,8 @@ public class Board {
     /**
      * Undo a prior applyTiles call
      */
-    public void unapplyTiles(List<PlacedTile> newlyPlacedTiles){
-        for (PlacedTile t : newlyPlacedTiles){
+    public void unapplyTiles(List<PlacedTile> newlyPlacedTiles) {
+        for (PlacedTile t : newlyPlacedTiles) {
             grid[t.row()][t.column()] = '.';
         }
     }
@@ -182,12 +180,10 @@ public class Board {
      * Apply a list of tiles onto the board (used by solver evaluation)
      * Tiles are assumed to only target empty squares
      */
-    public void applyTiles(List<PlacedTile> tiles){
-        for (PlacedTile t : tiles){
+    public void applyTiles(List<PlacedTile> tiles) {
+        for (PlacedTile t : tiles) {
             setTile(t.row(), t.column(), t.tile());
         }
     }
-
-    
 
 }

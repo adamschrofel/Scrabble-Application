@@ -1,8 +1,9 @@
-package ca.adamschrofel.scrabble.services;
+package ca.adamschrofel.scrabble.service;
 
 import org.springframework.stereotype.Service;
 
 import ca.adamschrofel.scrabble.board.Board;
+
 /**
  * In-memory representation of the current board state for the running server.
  *
@@ -15,27 +16,31 @@ import ca.adamschrofel.scrabble.board.Board;
  */
 @Service
 public class BoardService {
-    public static final int SIZE = 15;
+    /** Board dimensions (15x15). Kept in sync with {@link Board#SIZE}. */
+    public static final int SIZE = Board.SIZE;
 
     private final char[][] grid = new char[SIZE][SIZE];
 
     public BoardService() {
         reset();
     }
+
     /**
      * Creates a new {@link Board} populated with the service's current grid.
      */
-    public synchronized Board setupStandardBoard() {
-        Board b = new Board();
+    public synchronized Board snapshotBoard() {
+        Board board = new Board();
         for (int row = 0; row < SIZE; row++) {
             for (int column = 0; column < SIZE; column++) {
-                b.setTile(row, column, grid[row][column]);
+                board.setTile(row, column, grid[row][column]);
             }
         }
-        return b;
 
+        return board;
     }
-     /** Clears the board to an all-empty ('.') state. */
+
+    /** Clears the board to an all-empty ('.') state. */
+
     public synchronized void reset() {
         for (int row = 0; row < SIZE; row++) {
             for (int column = 0; column < SIZE; column++) {
@@ -43,11 +48,14 @@ public class BoardService {
             }
         }
     }
+
     /** Returns the tile at the given position, or '.' if empty. */
+
     public synchronized char get(int row, int col) {
         check(row, col);
         return grid[row][col];
     }
+
     /**
      * Sets a tile on the board.
      *
@@ -64,7 +72,9 @@ public class BoardService {
         }
         grid[row][col] = tile;
     }
+
     /** Returns a 15-element array of row strings ('.' for empty). */
+
     public synchronized String[] rowsAsStrings() {
         String[] rows = new String[SIZE];
         for (int r = 0; r < SIZE; r++) {
@@ -72,7 +82,7 @@ public class BoardService {
         }
         return rows;
     }
-    
+
     private void check(int row, int col) {
         if (row < 0 || row >= SIZE || col < 0 || col >= SIZE) {
             throw new IllegalArgumentException("Out of bounds: (" + row + "," + col + ")");

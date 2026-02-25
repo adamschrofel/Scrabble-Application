@@ -1,4 +1,4 @@
-package ca.adamschrofel.scrabble.services;
+package ca.adamschrofel.scrabble.service;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;

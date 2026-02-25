@@ -1,5 +1,9 @@
 package ca.adamschrofel.scrabble.board;
-
+/**
+ * Defines the bonus-square layout for a Scrabble board (e.g., double-word, triple-letter).
+ *
+ * <p>The layout is immutable and used during scoring.
+ */
 public class BoardLayout {
     private final TileType[][] tileType = new TileType[Board.SIZE][Board.SIZE];
 
@@ -35,7 +39,7 @@ public class BoardLayout {
         // Double Word
         int[][] DW = { { 1, 1 }, { 2, 2 }, { 3, 3 }, { 4, 4 },
                 { 7, 7 }, { 10, 10 }, { 11, 11 }, { 12, 12 }, { 13, 13 },
-                 { 1, 13 }, { 2, 12 }, { 3, 11 }, { 4, 10 },
+                { 1, 13 }, { 2, 12 }, { 3, 11 }, { 4, 10 },
                 { 10, 4 }, { 11, 3 }, { 12, 2 }, { 13, 1 } };
         // Triple Letter
         int[][] TL = {

@@ -1,7 +1,9 @@
 package ca.adamschrofel.scrabble.exceptions;
-
-public class InvalidBoardException extends RuntimeException{
-    public InvalidBoardException(String message){
+/**
+ * Thrown when a provided board representation is malformed (wrong size/characters/etc.).
+ */
+public class InvalidBoardException extends RuntimeException {
+    public InvalidBoardException(String message) {
         super(message);
     }
 }

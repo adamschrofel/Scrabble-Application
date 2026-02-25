@@ -1,20 +1,20 @@
 package ca.adamschrofel.scrabble.rack;
 
 import ca.adamschrofel.scrabble.dictionary.Dictionary;
-import ca.adamschrofel.scrabble.dto.LengthGroup;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 /**
- * Rack-only word finder: given a rack (letters + up to two blanks), returns all dictionary words that can be formed.
+ * Rack-only word finder: given a rack (letters + up to two blanks), returns all
+ * dictionary words that can be formed.
  * This does NOT consider board constraints or multipliers.
  */
 public final class RackWordFinder {
 
     /**
-     * Returns a flat list of playable words sorted by descending length, then alphabetically within a length.
+     * Returns a flat list of playable words sorted by descending length, then
+     * alphabetically within a length.
      */
     public List<String> findPlayableWords(String rackInput, Dictionary dict) {
         Rack rack = Rack.parseRack(rackInput);
@@ -40,7 +40,8 @@ public final class RackWordFinder {
     }
 
     /**
-     * Groups a sorted list of playable words (descending length) into LengthGroup objects for JSON.
+     * Groups a sorted list of playable words (descending length) into LengthGroup
+     * objects for JSON.
      */
     public List<LengthGroup> groupPlayableWords(List<String> playableWords) {
         ArrayList<LengthGroup> groups = new ArrayList<>();

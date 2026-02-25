@@ -90,7 +90,7 @@ public class Rack {
                         "15 tiles max");
             }
 
-            if(blanks> 2){
+            if (blanks > 2) {
                 throw new IllegalArgumentException("Only 2 blanks max");
             }
         }
@@ -123,7 +123,8 @@ public class Rack {
     }
 
     /**
-     * Returns true if this rack (letters + blanks) can cover the requested letter counts.
+     * Returns true if this rack (letters + blanks) can cover the requested letter
+     * counts.
      * neededCounts is expected to be length 26.
      */
     public boolean canCover(int[] neededCounts) {

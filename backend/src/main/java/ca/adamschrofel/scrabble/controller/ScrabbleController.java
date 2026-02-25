@@ -7,34 +7,39 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import ca.adamschrofel.scrabble.InputValidator;
 import ca.adamschrofel.scrabble.board.Board;
 import ca.adamschrofel.scrabble.dto.BestPlay;
-import ca.adamschrofel.scrabble.dto.BoardResponse;
+import ca.adamschrofel.scrabble.dto.BoardSolveRequest;
+import ca.adamschrofel.scrabble.dto.BoardState;
+import ca.adamschrofel.scrabble.dto.BoardTileUpdate;
+import ca.adamschrofel.scrabble.dto.BoardUpdateRequest;
 import ca.adamschrofel.scrabble.dto.DefinitionResponse;
-import ca.adamschrofel.scrabble.dto.LengthGroup;
 import ca.adamschrofel.scrabble.dto.ScoreWord;
-import ca.adamschrofel.scrabble.dto.SetTileRequest;
-import ca.adamschrofel.scrabble.dto.SetTilesRequest;
 import ca.adamschrofel.scrabble.dto.SolveResponse;
 import ca.adamschrofel.scrabble.dto.WordGroup;
 import ca.adamschrofel.scrabble.exceptions.InvalidTilesException;
+import ca.adamschrofel.scrabble.rack.LengthGroup;
 import ca.adamschrofel.scrabble.scoring.ScrabbleScoring;
-import ca.adamschrofel.scrabble.services.*;
+import ca.adamschrofel.scrabble.service.BoardService;
+import ca.adamschrofel.scrabble.service.DefinitionService;
+import ca.adamschrofel.scrabble.service.ScrabbleService;
 
 
 
 
 /**
- * REST controller that handles HTTP requests for word solving and word
+ * REST controller that handles HTTP requests for word solving and word.
  * definitions.
  * Exposes two endpoints: /api/solve for finding valid Scrabble words from
  * tiles,
  * and /api/define for retrieving word definitions from the CSW dictionary.
  */
 @RestController
+@RequestMapping("/api")
 public class ScrabbleController {
     private final ScrabbleService service;
     private final DefinitionService definitions;
@@ -66,9 +71,14 @@ public class ScrabbleController {
      * @throws InvalidTilesException If the input contains invalid characters or
      *                               exceeds 15 tiles
      */
-    // TODO change name for this, solvefordefinition?
-    @GetMapping("/api/solve")
-    public SolveResponse solve(@RequestParam String tiles) throws InvalidTilesException {
+    /**
+     * Rack-only solver.
+     *
+     * <p>Primary route: {@code GET /api/rack/solve?tiles=...}
+     * (Alias: {@code GET /api/solve?tiles=...})</p>
+     */
+    @GetMapping({"/rack/solve", "/solve"})
+    public SolveResponse solveRack(@RequestParam String tiles) throws InvalidTilesException {
         // Validate and normalize the tile input (uppercase, no spaces, check for valid
         // chars)
         String tilesNormalized = InputValidator.normalizeTiles(tiles);
@@ -94,7 +104,13 @@ public class ScrabbleController {
      * @return A map containing the word, whether it was found, and its definition
      *         (or null if not found)
      */
-    @GetMapping("/api/define")
+    /**
+     * Dictionary definition lookup.
+     *
+     * <p>Primary route: {@code GET /api/word/define?word=...}
+     * (Alias: {@code GET /api/define?word=...})</p>
+     */
+    @GetMapping({"/word/define", "/define"})
     public DefinitionResponse define(@RequestParam String word) {
         // Look up the word in the definitions dictionary
 
@@ -103,43 +119,60 @@ public class ScrabbleController {
         return new DefinitionResponse(normalized, definition != null, definition);
     }
 
-    @GetMapping("/api/bestplays")
-    public List<BestPlay> bestPlays(
+    /**
+     * Board solver (best plays) using the current server-side board state.
+     *
+     * <p>Primary route: {@code POST /api/board/solve} with JSON body.
+     * (Alias: {@code GET /api/bestplays?tiles=...&limit=...})</p>
+     */
+    @PostMapping("/board/solve")
+    public List<BestPlay> solveBoard(@RequestBody BoardSolveRequest request) throws InvalidTilesException {
+        String rack = request == null ? null : request.rack();
+        int limit = (request != null && request.limit() != null) ? request.limit() : 25;
+
+        Board current = board.snapshotBoard();
+        return service.bestPlays(current, rack, limit);
+    }
+
+    /**
+     * Backward-compatible alias for board solving.
+     */
+    @GetMapping("/bestplays")
+    public List<BestPlay> bestPlaysAlias(
             @RequestParam String tiles,
             @RequestParam(defaultValue = "25") int limit) throws InvalidTilesException {
-        Board b = board.setupStandardBoard();
-
-        // Delegate to service (which knows dictionary/layout)
-        return service.bestPlays(b, tiles, limit);
+        Board current = board.snapshotBoard();
+        return service.bestPlays(current, tiles, limit);
     }
 
-    @GetMapping("/api/board")
-    public BoardResponse getBoard() {
-        return new BoardResponse(BoardService.SIZE, board.rowsAsStrings());
+    @GetMapping("/board")
+    public BoardState getBoard() {
+        return new BoardState(BoardService.SIZE, List.of(board.rowsAsStrings()));
     }
 
-    @PostMapping("/api/board/reset")
-    public BoardResponse resetBoard() {
+    @PostMapping("/board/reset")
+    public BoardState resetBoard() {
         board.reset();
-        return new BoardResponse(BoardService.SIZE, board.rowsAsStrings());
+        return new BoardState(BoardService.SIZE, List.of(board.rowsAsStrings()));
     }
 
-    @PostMapping("/api/board/tile")
-    public BoardResponse setTile(@RequestBody SetTileRequest req) {
-        char tile = normalizeTile(req.tile());
+    @SuppressWarnings("null")
+    @PostMapping("/board/tile")
+    public BoardState setTile(@RequestBody BoardTileUpdate req) {
+        char tile = normalizeTile(req == null ? null : req.tile());
         board.set(req.row(), req.column(), tile);
-        return new BoardResponse(BoardService.SIZE, board.rowsAsStrings());
+        return new BoardState(BoardService.SIZE, List.of(board.rowsAsStrings()));
     }
 
-    @PostMapping("/api/board/tiles")
-    public BoardResponse setTiles(@RequestBody SetTilesRequest req) {
-        if (req.tiles() != null) {
-            for (SetTileRequest t : req.tiles()) {
+    @PostMapping("/board/tiles")
+    public BoardState setTiles(@RequestBody BoardUpdateRequest req) {
+        if (req != null && req.tiles() != null) {
+            for (BoardTileUpdate t : req.tiles()) {
                 char tile = normalizeTile(t.tile());
                 board.set(t.row(), t.column(), tile);
             }
         }
-        return new BoardResponse(BoardService.SIZE, board.rowsAsStrings());
+        return new BoardState(BoardService.SIZE, List.of(board.rowsAsStrings()));
     }
 
     private char normalizeTile(String tile) {

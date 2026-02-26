@@ -22,7 +22,7 @@ export async function apiJson(url, options = {}) {
     ...(options.headers ?? {}),
   };
 
-  const res = await fetch(url, { ...options, headers });
+  const res = await fetch(withBase(url), { ...options, headers });
 
   // Read as text first to handle empty bodies / non-JSON errors gracefully.
   const raw = await res.text();

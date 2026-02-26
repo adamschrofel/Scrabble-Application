@@ -1,20 +1,19 @@
 # Scrabble Solver / Word Finder
 
-A full-stack Scrabble word finder and solver that helps players discover valid words, scores, and placements based on their rack and board state.
+A full-stack Scrabble helper that can:
+- generate all valid words from a rack (with blanks)
+- validate words + return definitions (CSW19)
+- solve a board state and suggest best plays
 
 This project started as a Java command-line tool and has evolved into a web application with a Spring Boot backend and a React frontend.
-
 ---
 
 ## Features
 
-- Find all valid Scrabble words from a given rack
-- Supports blank tiles (`?` or `*`)
-- Calculates Scrabble scores
-- Board input support for more advanced solving
-- Clean web UI built with React
-- REST API backend built with Spring Boot
-
+- **Rack solving**: find valid words grouped by length, with scores
+- **Board solving**: suggest best placements based on current board state
+- **Word definitions**: CSW19-based definitions lookup (Currently working on integrating newer version)
+- **Blank tiles**: supports `?` or `*` as wildcards
 ---
 
 ## Tech Stack
@@ -23,53 +22,111 @@ This project started as a Java command-line tool and has evolved into a web appl
 - Java
 - Spring Boot
 - Maven
-- Custom Scrabble dictionary (CSW)
 
 ### Frontend
 - React
+- React Router
 - Vite
 - JavaScript / JSX
-- CSS
+- Tailwind CSS
 
 ---
 
-## Running the Project Locally
+## Architecture
+
+High-level flow:
+
+Frontend (React)  →  REST API (Spring Boot)  →  Solver + Dictionary
+
+Backend packages (simplified):
+- `controller`: REST endpoints (`/api/rack`, `/api/board`, `/api/words`)
+- `service`: orchestration + board state management
+- `solver`: move generation + evaluation
+- `dictionary`: trie + definition loading
+- `dto`: request/response types (API boundary)
+
+## API (Routes)
+
+- `GET /api/rack/solve?rack=ABCDE??` → rack solve results
+- `GET /api/words/{word}` → definition payload
+- `GET /api/board` → current board state
+- `POST /api/board/reset` → clear board
+- `POST /api/board/tiles` → set multiple tiles
+- `POST /api/board/solve` → best plays for current board + rack
+
+## Deployment Notes
+
+This repo is set up for separate deployments (frontend and backend).
+
+### Frontend environment
+
+The frontend can target either:
+- **Local dev proxy** (default): requests go to `/api/*` and Vite proxies to `http://localhost:8080`
+- **Deployed backend**: set `VITE_API_BASE_URL` to your backend origin
+
+Example:
+- `frontend/.env`:
+  - `VITE_API_BASE_URL=https://your-backend-host`
+
+A template is included at `frontend/.env.example`.
+
+
+### Backend environment
+
+The backend supports common hosting environments:
+- `PORT` (defaults to 8080)
+- `CORS_ALLOWED_ORIGINS` (comma-separated frontend origins)
+
+Example:
+- `PORT=8080`
+- `CORS_ALLOWED_ORIGINS=http://localhost:5173,https://your-frontend-host`
+
+## Run Locally
+
+### 1) Backend
 
 ```bash
-git clone https://github.com/adamschrofel/Scrabble-Application.git
-cd Scrabble-Application
-
-npm run setup
-npm run dev
-
-This starts:
-
-Spring Boot backend on http://localhost:8080
-
-React frontend on http://localhost:5173
-
-
+cd backend
+./mvnw spring-boot:run
 ```
-## Project Status
 
-This project is released as a **v1** focused usability.
-Performance optimizations and feature improvements are tracked in GitHub Issues.
+Backend runs on `http://localhost:8080`.
 
-## Motivation
+### 2) Frontend
 
-This project was built to:
-- Improve Java and algorithmic problem-solving skills
-- Learn Spring Boot and REST API design
-- Practice building a full-stack application from scratch
-- Create a portfolio project that combines logic, UX, and real-world constraints
-- Also… to help me continue to dominate my family at Scrabble.
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Frontend runs on `http://localhost:5173` and proxies `/api/*` to the backend.
+
+### (Optional) Run both with one command
+
+From the repo root:
+
+```bash
+npm install
+npm run dev
+```
+
+## CI
+
+GitHub Actions runs:
+- backend: `mvn test`
+- frontend: `npm run build`
+
+Workflow: `.github/workflows/ci.yml`
 
 ## Future Improvements
+
+- Basic unit/integration test coverage for solver + controllers
+- Performance instrumentation for board solving (timings + caching)
+- Persist board state per user/session instead of server-global state
 - Dictionary definitions via Merriam-Webster API
-- Mobile UI improvements
-- Performance optimizations, currently quite slow solving board with 2+ words played(Currently slowed down by dictionary iteration for board solving, scans dictionary for every anchor point)
+- UI Improvements
 
+---
 
-Author
-
-Adam Schrofel
+Author: Adam Schrofel

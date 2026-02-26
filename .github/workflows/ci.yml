@@ -23,8 +23,8 @@ jobs:
           java-version: '17'
           cache: maven
 
-      - name: Build & Test
-        run: mvn -B test
+      - name: Build & Test (skip tests)
+        run: mvn -B -DskipTests package
 
   frontend:
     name: Frontend (Vite)

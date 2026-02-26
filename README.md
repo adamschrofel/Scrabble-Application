@@ -1,19 +1,59 @@
 # Scrabble Solver / Word Finder
 
-A full-stack Scrabble helper that can:
-- generate all valid words from a rack (with blanks)
-- validate words + return definitions (CSW19)
-- solve a board state and suggest best plays
+A production-deployed, full-stack Scrabble helper that can:
 
-This project started as a Java command-line tool and has evolved into a web application with a Spring Boot backend and a React frontend.
+- Generate all valid words from a rack (with blank support)
+- Validate words and return CSW19 definitions
+- Solve a board state and suggest optimal plays
+- Score placements according to official Scrabble rules
+
+Originally built as a Java CLI tool, this project evolved into a deployed web application with a Spring Boot backend and a React frontend.
+
 ---
 
-## Features
+## Live Deployment
 
-- **Rack solving**: find valid words grouped by length, with scores
-- **Board solving**: suggest best placements based on current board state
-- **Word definitions**: CSW19-based definitions lookup (Currently working on integrating newer version)
-- **Blank tiles**: supports `?` or `*` as wildcards
+Frontend: https://scrabble-helpers.vercel.app  
+Backend: Hosted on Render
+
+---
+
+## Core Features
+
+### Rack Solver
+- Generates all valid words from a rack
+- Groups results by word length
+- Scores each word
+- Supports blank tiles (`?` or `*`)
+
+### Board Solver
+- Evaluates legal placements from current board state
+- Scores moves including cross-words
+- Returns top plays ranked by score
+- Handles blank assignments dynamically
+
+### Word Validation & Definitions
+- CSW19 dictionary(Will be updated to newest CSW in future)
+- Fast membership checks
+- Definition lookup endpoint
+
+---
+
+## Performance Architecture
+
+### Trie-Based Dictionary
+
+The dictionary is implemented using a **Trie (prefix tree)** data structure.
+
+Key benefits:
+
+- O(L) lookup time for word validation (L = word length)
+- Efficient prefix pruning during rack and board generation
+- Dramatically reduced candidate search space
+- Scalable move generation without scanning the entire dictionary
+
+The solver incrementally builds words using Trie traversal, significantly improving performance during board evaluation compared to original dictionary iteration.
+
 ---
 
 ## Tech Stack
@@ -22,6 +62,9 @@ This project started as a Java command-line tool and has evolved into a web appl
 - Java
 - Spring Boot
 - Maven
+- Custom Trie implementation
+- REST API architecture
+- Global CORS configuration
 
 ### Frontend
 - React
@@ -30,69 +73,100 @@ This project started as a Java command-line tool and has evolved into a web appl
 - JavaScript / JSX
 - Tailwind CSS
 
+### Hosting
+- Frontend: Vercel
+- Backend: Render
+
 ---
 
-## Architecture
+## Architecture Overview
 
-High-level flow:
+```
+Frontend (React SPA)
+        ↓
+REST API (Spring Boot)
+        ↓
+Solver Engine + Trie Dictionary
+```
 
-Frontend (React)  →  REST API (Spring Boot)  →  Solver + Dictionary
+### Backend Package Structure
 
-Backend packages (simplified):
-- `controller`: REST endpoints (`/api/rack`, `/api/board`, `/api/words`)
-- `service`: orchestration + board state management
-- `solver`: move generation + evaluation
-- `dictionary`: trie + definition loading
-- `dto`: request/response types (API boundary)
+- `controller` – REST endpoints (`/api/rack`, `/api/board`, `/api/words`)
+- `service` – orchestration + board state handling
+- `solver` – move generation + scoring engine
+- `dictionary` – Trie implementation + definition loading
+- `dto` – request/response contracts
 
-## API (Routes)
+---
 
-- `GET /api/rack/solve?rack=ABCDE??` → rack solve results
-- `GET /api/words/{word}` → definition payload
-- `GET /api/board` → current board state
-- `POST /api/board/reset` → clear board
-- `POST /api/board/tiles` → set multiple tiles
-- `POST /api/board/solve` → best plays for current board + rack
+## API Routes
 
-## Deployment Notes
+### Rack Solver
+- `GET /api/rack/solve?rack=ABCDE??`
 
-This repo is set up for separate deployments (frontend and backend).
+### Definitions
+- `GET /api/words/{word}`
 
-### Frontend environment
+### Board State
+- `GET /api/board`
+- `POST /api/board/reset`
+- `POST /api/board/tiles`
 
-The frontend can target either:
-- **Local dev proxy** (default): requests go to `/api/*` and Vite proxies to `http://localhost:8080`
-- **Deployed backend**: set `VITE_API_BASE_URL` to your backend origin
+### Board Solve
+- `POST /api/board/solve`
 
-Example:
-- `frontend/.env`:
-  - `VITE_API_BASE_URL=https://your-backend-host`
+---
 
-A template is included at `frontend/.env.example`.
+## Deployment Configuration
 
+This project uses separate frontend and backend deployments.
 
-### Backend environment
+### Frontend Environment
 
-The backend supports common hosting environments:
-- `PORT` (defaults to 8080)
-- `CORS_ALLOWED_ORIGINS` (comma-separated frontend origins)
+The frontend uses `VITE_API_BASE_URL` to determine the backend origin.
 
-Example:
-- `PORT=8080`
-- `CORS_ALLOWED_ORIGINS=http://localhost:5173,https://your-frontend-host`
+Example (`frontend/.env`):
+
+```
+VITE_API_BASE_URL=https://scrabble-application-backend.onrender.com
+```
+
+If unset, local development proxy is used.
+
+---
+
+### Backend Environment
+
+Supported environment variables:
+
+- `PORT`
+- `APP_CORS_ALLOWED_ORIGINS`
+
+Example (Render environment settings):
+
+```
+PORT=8080
+APP_CORS_ALLOWED_ORIGINS=https://scrabble-helpers.vercel.app
+```
+
+Global CORS configuration ensures the deployed frontend can access the backend API.
+
+---
 
 ## Run Locally
 
-### 1) Backend
+### Backend
 
 ```bash
 cd backend
 ./mvnw spring-boot:run
 ```
 
-Backend runs on `http://localhost:8080`.
+Runs at: http://localhost:8080
 
-### 2) Frontend
+---
+
+### Frontend
 
 ```bash
 cd frontend
@@ -100,32 +174,38 @@ npm install
 npm run dev
 ```
 
-Frontend runs on `http://localhost:5173` and proxies `/api/*` to the backend.
+Runs at: http://localhost:5173
 
-### (Optional) Run both with one command
+During development, Vite proxies `/api/*` to the backend.
 
-From the repo root:
-
-```bash
-npm install
-npm run dev
-```
+---
 
 ## CI
 
 GitHub Actions runs:
-- backend: `mvn test`
-- frontend: `npm run build`
+
+- Backend: `mvn test`
+- Frontend: `npm run build`
 
 Workflow: `.github/workflows/ci.yml`
 
+---
+
+## Versioning
+
+- `v1.1.0` – Trie-based dictionary + production deployment
+
+---
+
 ## Future Improvements
 
-- Basic unit/integration test coverage for solver + controllers
-- Performance instrumentation for board solving (timings + caching)
-- Persist board state per user/session instead of server-global state
-- Dictionary definitions via Merriam-Webster API
-- UI Improvements
+- Solver performance instrumentation & caching
+- Persistent board state (database-backed)
+- Expanded test coverage
+- Updated dictionary versions
+- Advanced move heuristics (leave-value evaluation)
+- Improved UI
+
 
 ---
 

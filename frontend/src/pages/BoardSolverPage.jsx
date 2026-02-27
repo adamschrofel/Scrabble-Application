@@ -117,7 +117,6 @@ export default function BoardSolverPage() {
 
   useEffect(() => {
     loadBoard().catch((e) => setError(e.message));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function onSelect(r, c) {

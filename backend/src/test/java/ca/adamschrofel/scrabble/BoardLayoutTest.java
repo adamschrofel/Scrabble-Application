@@ -10,9 +10,9 @@ import ca.adamschrofel.scrabble.board.TileType;
 public class BoardLayoutTest {
     
     @Test
-    void testcenter(){
+    void testBoardTiles(){
         BoardLayout layout = BoardLayout.standardLayout();
         assertEquals(TileType.DOUBLE_WORD, layout.getTileType(7, 7));
-        assertEquals(TileType.NORMAL, layout.getTileType(0, 0));
+        assertEquals(TileType.TRIPLE_WORD, layout.getTileType(0, 0));
     }
 }

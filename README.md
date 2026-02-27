@@ -184,8 +184,8 @@ During development, Vite proxies `/api/*` to the backend.
 
 GitHub Actions runs:
 
-- Backend: `mvn test`
-- Frontend: `npm run build`
+- Backend: `mvn verify` (includes unit tests)
+- Frontend: `npm run lint`, `npm test`, `npm run build`
 
 Workflow: `.github/workflows/ci.yml`
 

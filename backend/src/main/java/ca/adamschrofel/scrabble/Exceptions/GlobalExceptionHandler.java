@@ -44,4 +44,20 @@ public class GlobalExceptionHandler {
                 Map.of("error", "INVALID_BOARD",
                         "message", e.getMessage()));
     }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, Object>> handleIllegalArgument(IllegalArgumentException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                Map.of("error", "BAD_REQUEST",
+                        "message", e.getMessage()));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, Object>> handleUnexpected(Exception e) {
+        // Avoid leaking internals to the client.
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                Map.of("error", "INTERNAL_SERVER_ERROR",
+                        "message", "An unexpected error occurred."));
+    }
+
 }

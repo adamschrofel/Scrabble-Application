@@ -13,7 +13,6 @@ public class BoardLayoutTest {
     void testcenter(){
         BoardLayout layout = BoardLayout.standardLayout();
         assertEquals(TileType.DOUBLE_WORD, layout.getTileType(7, 7));
-        System.out.println(layout.getTileType(7, 7));
         assertEquals(TileType.NORMAL, layout.getTileType(0, 0));
     }
 }

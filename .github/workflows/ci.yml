@@ -23,8 +23,8 @@ jobs:
           java-version: '17'
           cache: maven
 
-      - name: Build & Test (skip tests)
-        run: mvn -B -DskipTests package
+      - name: Build & Test
+        run: mvn -B verify
 
   frontend:
     name: Frontend (Vite)
@@ -46,5 +46,11 @@ jobs:
       - name: Install
         run: npm ci
 
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm test
+        
       - name: Build
         run: npm run build

@@ -57,18 +57,26 @@ public class BoardController {
         return getBoard();
     }
 
-    @SuppressWarnings("null")
     @PostMapping("/tile")
-    public BoardState setTile(@RequestBody BoardTileUpdate req) {
-        char tile = normalizeTile(req == null ? null : req.tile());
+    public BoardState setTile(@RequestBody(required = false) BoardTileUpdate req) {
+        if (req == null) {
+            throw new IllegalArgumentException("Request body is required.");
+        }
+        char tile = normalizeTile(req.tile());
         board.set(req.row(), req.column(), tile);
         return getBoard();
     }
 
     @PostMapping("/tiles")
-    public BoardState setTiles(@RequestBody BoardUpdateRequest req) {
-        if (req != null && req.tiles() != null) {
+    public BoardState setTiles(@RequestBody(required = false) BoardUpdateRequest req) {
+        if (req == null) {
+            throw new IllegalArgumentException("Request body is required.");
+        }
+        if (req.tiles() != null) {
             for (BoardTileUpdate t : req.tiles()) {
+                if (t == null) {
+                    continue;
+                }
                 char tile = normalizeTile(t.tile());
                 board.set(t.row(), t.column(), tile);
             }

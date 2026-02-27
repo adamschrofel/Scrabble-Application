@@ -14,10 +14,10 @@ public class WebConfig implements WebMvcConfigurer {
 
     private final List<String> allowedOrigins;
 
-    public WebConfig(@Value("${app.cors.allowed-origins:*}") String origins) {
+    public WebConfig(@Value("${app.cors.allowed-origins:}") String origins) {
         // Accept either "*" or a comma-separated list.
         if (origins == null || origins.isBlank()) {
-            this.allowedOrigins = List.of("*");
+            this.allowedOrigins = List.of("http://localhost:5173");
         } else {
             this.allowedOrigins = Arrays.stream(origins.split(","))
                     .map(String::trim)

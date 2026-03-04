@@ -19,7 +19,7 @@ export default function HomePage() {
 
         <p className="mt-3">
           Note: The backend is hosted on a free server. If it has been idle,
-          the first request may take <span className="font-medium">20–40 seconds</span> while
+          the first request may take <span className="font-medium">20–what feels like forever seconds</span> while
           the server spins up. Subsequent requests will respond normally.
         </p>
       </div>

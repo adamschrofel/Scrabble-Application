@@ -4,7 +4,7 @@ import PageShell from "../components/PageShell";
 import ErrorBanner from "../components/ErrorBanner";
 import { getDefinition } from "../api/scrabbleApi";
 import { ui } from "../ui";
-import PageHeader from "../components/PageHeader";
+
 
 export default function DefinitionPage() {
   const { word } = useParams();
@@ -44,9 +44,7 @@ export default function DefinitionPage() {
       title={word}
       subtitle="Definition"
       showNav={false}
-
       headerRight={
-        
         <button className={ui.back} onClick={() => navigate(-1)}>
           ← Back
         </button>

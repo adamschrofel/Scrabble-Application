@@ -38,21 +38,26 @@ export default function WordFinderPage() {
   function onKeyDown(e) {
     if (e.key === "Enter") handleSolve();
   }
-
+  const foundWords =
+    data?.groups?.reduce((acc, g) => acc + g.words.length, 0) ?? 0;
   return (
     <PageShell
       title="Scrabble Helpers"
       subtitle="Enter your rack and get ranked word options."
-      
     >
       <div className={`mt-6 ${ui.card}`}>
-        <div className="flex gap-3">
+        <label htmlFor="tiles-input" className={ui.label}>
+          Rack tiles
+        </label>
+        <div className="mt-2 flex flex-col gap-3 sm:flex-row">
           <input
+            id="tiles-input"
             className={ui.input}
             value={tiles}
             onChange={(e) => setTiles(e.target.value)}
             onKeyDown={onKeyDown}
             placeholder="e.g., triedest (?/* = blank)"
+            aria-describedby="tiles-help"
           />
           <button
             className={ui.button}
@@ -62,10 +67,14 @@ export default function WordFinderPage() {
             {loading ? "Solving..." : "Solve"}
           </button>
         </div>
-
+          <p id="tiles-help" className="mt-2 text-xs text-slate-400">
+          Use ? or * for blank tiles.
+        </p>
         <ErrorBanner message={error} />
       </div>
-
+        <div className="sr-only" aria-live="polite">
+        {loading ? "Solving rack" : data?.groups ? `Found ${foundWords} words` : ""}
+      </div>
       {data?.groups ? (
         <div className="mt-8 space-y-8">
           {data.groups.length === 0 ? (

@@ -11,19 +11,20 @@ export default function PrimaryNav() {
   const { pathname } = useLocation();
 
   return (
-    <div className="mt-4 flex flex-wrap gap-3">
+    <nav aria-label="Primary" className="mt-4 flex flex-wrap gap-3">
       {items.map((it) => {
         const active = pathname.startsWith(it.to);
         return (
           <Link
             key={it.to}
             to={it.to}
-            className={`${ui.back} ${active ? "border-violet-500/60" : ""}`}
+            aria-current={active ? "page" : undefined}
+            className={`${ui.back} ${active ? "border-violet-500/70 bg-violet-950/40" : ""}`}
           >
             {it.label}
           </Link>
         );
       })}
-    </div>
+    </nav>
   );
 }

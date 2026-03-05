@@ -33,63 +33,67 @@ function BoardGrid({ rows, selected, onSelect, overlayTiles }) {
   }, [overlayTiles]);
 
   return (
-    <div
-      className="inline-grid gap-1"
-      style={{ gridTemplateColumns: `repeat(${SIZE}, minmax(0, 1fr))` }}
-    >
-      {Array.from({ length: SIZE }).map((_, r) =>
-        Array.from({ length: SIZE }).map((__, c) => {
-          const base = (rows?.[r]?.[c] ?? ".").toUpperCase();
-          const overlay = overlayMap.get(`${r},${c}`);
-          const letter = overlay ?? (base === "." ? "" : base);
+    <div className="overflow-x-auto pb-2" role="region" aria-label="Scrabble board">
+      <div
+        className="inline-grid min-w-max gap-1"
+        style={{ gridTemplateColumns: `repeat(${SIZE}, minmax(0, 1fr))` }}
+      >
+        {Array.from({ length: SIZE }).map((_, r) =>
+          Array.from({ length: SIZE }).map((__, c) => {
+            const base = (rows?.[r]?.[c] ?? ".").toUpperCase();
+            const overlay = overlayMap.get(`${r},${c}`);
+            const letter = overlay ?? (base === "." ? "" : base);
 
-          const type = bonusAt(r, c);
-          const isSelected = selected?.row === r && selected?.column === c;
-          const isOverlay = !!overlay;
+            const type = bonusAt(r, c);
+            const isSelected = selected?.row === r && selected?.column === c;
+            const isOverlay = !!overlay;
 
-          const bg =
-            type === "TW"
-              ? "bg-rose-700/40 border-rose-500/40"
-              : type === "DW"
-                ? "bg-rose-500/25 border-rose-400/30"
-                : type === "TL"
-                  ? "bg-sky-700/35 border-sky-500/40"
-                  : type === "DL"
-                    ? "bg-sky-500/20 border-sky-400/30"
-                    : "bg-slate-950 border-slate-800";
+            const bg =
+              type === "TW"
+                ? "bg-rose-700/40 border-rose-500/40"
+                : type === "DW"
+                  ? "bg-rose-500/25 border-rose-400/30"
+                  : type === "TL"
+                    ? "bg-sky-700/35 border-sky-500/40"
+                    : type === "DL"
+                      ? "bg-sky-500/20 border-sky-400/30"
+                      : "bg-slate-950 border-slate-800";
 
-          const ring = isSelected ? "ring-2 ring-violet-500" : "";
-          const overlayGlow = isOverlay ? "ring-2 ring-emerald-400/70" : "";
+            const ring = isSelected ? "ring-2 ring-violet-500" : "";
+            const overlayGlow = isOverlay ? "ring-2 ring-emerald-400/70" : "";
 
-          return (
-            <button
-              key={`${r}-${c}`}
-              type="button"
-              onClick={() => onSelect(r, c)}
-              className={[
-                "h-7 w-7 sm:h-8 sm:w-8 rounded-md border text-xs sm:text-sm font-extrabold",
-                "flex items-center justify-center select-none",
-                bg,
-                ring,
-                overlayGlow,
-              ].join(" ")}
-              title={
-                type === "N"
-                  ? ""
-                  : type === "TW"
-                    ? "Triple Word"
-                    : type === "DW"
-                      ? "Double Word"
-                      : type === "TL"
-                        ? "Triple Letter"
-                        : "Double Letter"
-              }
-            >
-              {letter}
-            </button>
-          );
-        }),
-      )}
+            return (
+              <button
+                key={`${r}-${c}`}
+                type="button"
+                onClick={() => onSelect(r, c)}
+                className={[
+                  "h-8 w-8 sm:h-9 sm:w-9 rounded-md border text-sm font-extrabold",
+                  "flex items-center justify-center select-none",
+                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400/70",
+                  bg,
+                  ring,
+                  overlayGlow,
+                ].join(" ")}
+                title={
+                  type === "N"
+                    ? ""
+                    : type === "TW"
+                      ? "Triple Word"
+                      : type === "DW"
+                        ? "Double Word"
+                        : type === "TL"
+                          ? "Triple Letter"
+                          : "Double Letter"
+                }
+                aria-label={`Row ${r + 1}, Column ${c + 1}${letter ? `, ${letter}` : ", empty"}`}
+              >
+                {letter}
+              </button>
+            );
+          }),
+        )}
+      </div>
     </div>
   );
 }
@@ -101,6 +105,7 @@ export default function BoardSolverPage() {
   const [selectedPlayIdx, setSelectedPlayIdx] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [mobileTab, setMobileTab] = useState("board");
 
   const [selected, setSelected] = useState({ row: 7, column: 7 });
   const hiddenInputRef = useRef(null);
@@ -221,13 +226,13 @@ export default function BoardSolverPage() {
       setBestPlays(null);
       setSelectedPlayIdx(null);
 
-      // Ensure backend is using our current board state.
       const tiles = rowsToTiles(rows);
       await setBoardTiles(tiles);
 
       const plays = await solveBoard({ rack: trimmedRack, limit: 50 });
       setBestPlays(Array.isArray(plays) ? plays : []);
       setSelectedPlayIdx(0);
+      setMobileTab("plays");
     });
   }
 
@@ -236,8 +241,6 @@ export default function BoardSolverPage() {
 
     await withLoading(async () => {
       const play = bestPlays[selectedPlayIdx];
-
-      // Apply play to local rows
       const nextRows = rows.slice();
       for (const t of play.tilesPlaced ?? []) {
         const r = t.row;
@@ -250,12 +253,12 @@ export default function BoardSolverPage() {
         nextRows[r] = arr.join("");
       }
 
-      // Send full board state as source of truth
       const json = await setBoardTiles(rowsToTiles(nextRows));
       setRows(json?.rows ?? nextRows);
 
       setBestPlays(null);
       setSelectedPlayIdx(null);
+      setMobileTab("board");
     });
   }
 
@@ -272,7 +275,7 @@ export default function BoardSolverPage() {
             Rack tiles
           </label>
 
-          <div className="mt-2 flex gap-3">
+          <div className="mt-2 flex flex-col gap-3 sm:flex-row">
             <input
               id="rack-input"
               className={ui.input}
@@ -285,11 +288,15 @@ export default function BoardSolverPage() {
             </button>
           </div>
 
-          <div className="mt-4 text-xs text-slate-400">
-            Tip: Start with an empty board (Reset), type a few tiles, then Solve.
+          <div className="mt-4 rounded-xl border border-slate-800 bg-slate-950/70 p-3 text-xs text-slate-300">
+            <div className="font-semibold text-slate-200">Board controls</div>
+            <ul className="mt-1 list-disc pl-4">
+              <li>Tap or click a square to select it.</li>
+              <li>Type letters to fill cells; use Backspace/Delete to clear.</li>
+              <li>On mobile, switch tabs between board and play suggestions.</li>
+            </ul>
           </div>
 
-          {/* Hidden input to capture keyboard typing for the board */}
           <input
             ref={hiddenInputRef}
             className="fixed left-0 top-0 h-px w-px opacity-0 pointer-events-none"
@@ -299,14 +306,27 @@ export default function BoardSolverPage() {
             aria-hidden="true"
           />
 
-          <div className="mt-6 grid gap-6 lg:grid-cols-[auto,1fr] items-start">
-            <div className={ui.card}>
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <div className={ui.h2}>Board</div>
-                </div>
+          <div className="mt-5 flex gap-2 lg:hidden" role="tablist" aria-label="Board solver sections">
+            {["board", "plays"].map((tab) => (
+              <button
+                key={tab}
+                type="button"
+                role="tab"
+                aria-selected={mobileTab === tab}
+                className={`${ui.back} ${mobileTab === tab ? "border-violet-500/70 bg-violet-950/40" : ""}`}
+                onClick={() => setMobileTab(tab)}
+              >
+                {tab === "board" ? "Board" : "Best plays"}
+              </button>
+            ))}
+          </div>
 
-                <div className="flex gap-2">
+          <div className="mt-6 grid gap-6 items-start lg:grid-cols-[auto,1fr]">
+            <section className={`${ui.card} ${mobileTab !== "board" ? "hidden lg:block" : ""}`}>
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className={ui.h2}>Board</div>
+
+                <div className="flex flex-wrap gap-2">
                   <button className={ui.back} onClick={handleReset} disabled={loading}>
                     Reset
                   </button>
@@ -319,7 +339,8 @@ export default function BoardSolverPage() {
                 </div>
               </div>
 
-              <div className="mt-4">
+              <div className="mt-4 text-xs text-slate-400">Swipe horizontally if the board is clipped.</div>
+              <div className="mt-3">
                 <BoardGrid rows={rows} selected={selected} onSelect={onSelect} overlayTiles={overlayTiles} />
               </div>
 
@@ -332,9 +353,9 @@ export default function BoardSolverPage() {
               </div>
 
               <ErrorBanner message={error} />
-            </div>
+            </section>
 
-            <div>
+            <section className={mobileTab !== "plays" ? "hidden lg:block" : ""}>
               <div className={ui.h2}>Best plays</div>
 
               {!bestPlays ? (
@@ -355,7 +376,7 @@ export default function BoardSolverPage() {
                         type="button"
                         onClick={() => setSelectedPlayIdx(idx)}
                         className={[
-                          "w-full text-left rounded-xl border px-3 py-2",
+                          "w-full text-left rounded-xl border px-3 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400/70",
                           isSel
                             ? "border-violet-500 bg-violet-950/40"
                             : "border-slate-800 bg-slate-950 hover:bg-slate-900",
@@ -367,9 +388,7 @@ export default function BoardSolverPage() {
                         </div>
 
                         {p.wordsFormed?.length ? (
-                          <div className="mt-1 text-xs text-slate-400">
-                            Words: {p.wordsFormed.join(", ")}
-                          </div>
+                          <div className="mt-1 text-xs text-slate-400">Words: {p.wordsFormed.join(", ")}</div>
                         ) : null}
                       </button>
                     );
@@ -380,7 +399,15 @@ export default function BoardSolverPage() {
                   </div>
                 </div>
               )}
-            </div>
+            </section>
+          </div>
+
+          <div className="sr-only" aria-live="polite">
+            {loading
+              ? "Updating board"
+              : bestPlays
+                ? `${bestPlays.length} plays found`
+                : "Board ready"}
           </div>
         </div>
       </PageShell>

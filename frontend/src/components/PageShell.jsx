@@ -14,7 +14,7 @@ export default function PageShell({
       <div className={`${ui.container} relative`}>
         <div className="absolute inset-0 -z-10 rounded-3xl bg-slate-900/30 blur-2xl" />
 
-        <div className="flex items-start justify-between gap-4">
+        <header className="flex items-start justify-between gap-4">
           <div>
             <Link to="/" className="inline-block">
               <h1 className={ui.h1}>{title}</h1>
@@ -24,9 +24,9 @@ export default function PageShell({
           </div>
 
           {headerRight ? <div className="pt-2">{headerRight}</div> : null}
-        </div>
+        </header>
 
-        {children}
+        <main>{children}</main>
       </div>
     </div>
   );
